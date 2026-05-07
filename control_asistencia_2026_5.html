@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TLC — Control de Asistencia 2026</title>
+<style>
+  :root {
+    --azul-oscuro: #1a3a5c;
+    --azul-medio: #2563a8;
+    --azul-claro: #3b82c4;
+    --azul-muy-claro: #dbeafe;
+    --azul-hover: #1e4f8c;
+    --gris-oscuro: #374151;
+    --gris-medio: #6b7280;
+    --gris-claro: #e5e7eb;
+    --gris-muy-claro: #f3f4f6;
+    --blanco: #ffffff;
+    --verde: #16a34a;
+    --rojo: #dc2626;
+    --naranja: #ea580c;
+    --amarillo: #ca8a04;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--gris-muy-claro); color: var(--gris-oscuro); min-height: 100vh; }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul-medio) 100%);
+    color: white;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-icon {
+    width: 48px; height: 48px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .header-title h1 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .header-title p {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+  .header-stats {
+    display: flex; gap: 24px;
+  }
+  .hstat {
+    text-align: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 8px 18px;
+  }
+  .hstat-num { font-size: 1.5rem; font-weight: 700; }
+  .hstat-label { font-size: 0.7rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* NAVIGATION */
+  .nav {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    background: rgba(0,0,0,0.15);
+  }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    padding: 14px 22px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { color: white; background: rgba(255,255,255,0.08); }
+  .nav-btn.active { color: white; border-bottom-color: #60a5fa; background: rgba(255,255,255,0.1); }
+
+  /* MAIN CONTENT */
+  .main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .card-header {
+    background: linear-gradient(90deg, var(--azul-oscuro), var(--azul-medio));
+    color: white;
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-header h2 { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .card-body { padding: 20px 24px; }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 20px;
+    background: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .filter-bar label { font-size: 0.83rem; color: var(--gris-medio); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .filter-bar select, .filter-bar input {
+    border: 1.5px solid var(--gris-claro);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 0.88rem;
+    color: var(--gris-oscuro);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .filter-bar select:focus, .filter-bar input:focus { border-color: var(--azul-claro); }
+  .filter-info { margin-left: auto; font-size: 0.83rem; color: var(--gris-medio); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th {
+    background: var(--azul-oscuro);
+    color: white;
+    padding: 11px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+  th:first-child { border-radius: 0; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--gris-claro); vertical-align: middle; }
+  tr:hover td { background: var(--azul-muy-claro); }
+  tr:last-child td { border-bottom: none; }
+  .num-col { text-align: center; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 600;
+  }
+  .badge-si { background: #dcfce7; color: #15803d; }
+  .badge-no { background: #fee2e2; color: #b91c1c; }
+  .badge-cat { background: var(--azul-muy-claro); color: var(--azul-medio); }
+  .badge-nino { background: #fef9c3; color: #92400e; }
+  .badge-preadol { background: #fce7f3; color: #9d174d; }
+  .badge-adol { background: #ede9fe; color: #5b21b6; }
+  .badge-adulto { background: #dbeafe; color: #1d4ed8; }
+  .badge-sinfecha { background: #f3f4f6; color: #6b7280; }
+
+  /* ATTENDANCE DOTS */
+  .dots { display: flex; gap: 5px; justify-content: center; }
+  .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-si { background: #22c55e; }
+  .dot-no { background: #ef4444; }
+
+  /* STAT CARDS */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border-left: 5px solid var(--azul-claro);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+  .stat-card.clickable { border-color: var(--azul-medio); }
+  .stat-num { font-size: 2.1rem; font-weight: 800; color: var(--azul-oscuro); }
+  .stat-label { font-size: 0.82rem; color: var(--gris-medio); margin-top: 4px; font-weight: 500; }
+  .stat-sub { font-size: 0.75rem; color: var(--azul-claro); margin-top: 6px; }
+  .stat-icon { font-size: 1.8rem; margin-bottom: 8px; }
+
+  .stat-card.nino { border-left-color: #f59e0b; }
+  .stat-card.preadol { border-left-color: #ec4899; }
+  .stat-card.adol { border-left-color: #8b5cf6; }
+  .stat-card.adulto { border-left-color: #2563a8; }
+  .stat-card.total3 { border-left-color: #16a34a; }
+  .stat-card.inasist { border-left-color: #dc2626; }
+
+  /* DATE BAR CHART */
+  .bar-chart { display: flex; gap: 16px; align-items: flex-end; margin-top: 16px; height: 140px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .bar {
+    width: 100%;
+    background: linear-gradient(180deg, var(--azul-claro), var(--azul-oscuro));
+    border-radius: 6px 6px 0 0;
+    transition: height 0.5s ease;
+    min-height: 4px;
+    cursor: pointer;
+    position: relative;
+  }
+  .bar:hover { opacity: 0.85; }
+  .bar-val { font-size: 1rem; font-weight: 700; color: var(--azul-oscuro); }
+  .bar-date { font-size: 0.75rem; color: var(--gris-medio); text-align: center; margin-top: 4px; }
+  .chart-area { height: 120px; display: flex; gap: 16px; align-items: flex-end; }
+
+  /* INASISTENCIA rank */
+  .rank-num {
+    font-size: 0.85rem; font-weight: 700;
+    color: var(--gris-medio);
+    min-width: 28px;
+  }
+  .inasist-bar {
+    height: 8px; border-radius: 4px;
+    background: linear-gradient(90deg, #dc2626, #f87171);
+    min-width: 10px;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    width: 92%;
+    max-width: 900px;
+    max-height: 88vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column;
+  }
+  .modal-header {
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-medio));
+    color: white;
+    padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-header h3 { font-size: 1.05rem; }
+  .modal-close {
+    background: rgba(255,255,255,0.2); border: none;
+    color: white; cursor: pointer;
+    width: 32px; height: 32px; border-radius: 50%;
+    font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.35); }
+  .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+  .modal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 10px;
+  }
+  .modal-person {
+    background: var(--gris-muy-claro);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    border-left: 4px solid var(--azul-claro);
+  }
+  .mp-num { font-size: 0.75rem; color: var(--gris-medio); min-width: 22px; }
+  .mp-name { font-size: 0.83rem; font-weight: 600; color: var(--azul-oscuro); }
+  .mp-cat { font-size: 0.72rem; color: var(--gris-medio); }
+
+  /* PAGINATION */
+  .pagination { display: flex; gap: 6px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .pg-btn {
+    padding: 5px 11px; border: 1.5px solid var(--gris-claro);
+    border-radius: 6px; background: white; cursor: pointer;
+    font-size: 0.82rem; color: var(--gris-oscuro);
+    transition: all 0.15s;
+  }
+  .pg-btn:hover { border-color: var(--azul-claro); color: var(--azul-medio); }
+  .pg-btn.active { background: var(--azul-medio); color: white; border-color: var(--azul-medio); }
+  .pg-btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 40px; color: var(--gris-medio); }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+
+  /* SECTION TITLE */
+  .section-title {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-title h2 { font-size: 1.3rem; font-weight: 700; color: var(--azul-oscuro); }
+  .section-title p { font-size: 0.85rem; color: var(--gris-medio); margin-top: 2px; }
+
+  .tooltip { font-size: 0.75rem; color: var(--azul-claro); cursor: pointer; }
+
+  @media (max-width: 768px) {
+    .header-top { flex-direction: column; gap: 14px; padding: 16px; }
+    .header-stats { flex-wrap: wrap; justify-content: center; }
+    .nav { padding: 0 8px; overflow-x: auto; }
+    .main { padding: 16px; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .age-card { position:relative; overflow:hidden; }
+  .age-pct-bg { position:absolute;top:8px;right:10px;font-size:3.5rem;font-weight:900;opacity:0.09;line-height:1;pointer-events:none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="header-logo">
+      <div class="logo-icon">⛪</div>
+      <div class="header-title">
+        <h1><span style="color:#60a5fa;">TLC</span> — Control de Asistencia 2026</h1>
+        <p>Templo La Cisterna &nbsp;·&nbsp; Sistema de Registro</p>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-num">288</div>
+        <div class="hstat-label">Total Registrados</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">41%</div>
+        <div class="hstat-label">Asistencia Promedio</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">3</div>
+        <div class="hstat-label">Reuniones 2026</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">55</div>
+        <div class="hstat-label">Sin faltar ninguna</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">106</div>
+        <div class="hstat-label">Nunca han asistido</div>
+      </div>
+      <div class="hstat" style="cursor:pointer;" onclick="openModal('inasist2')">
+        <div class="hstat-num">63</div>
+        <div class="hstat-label">Con 2+ inasistencias ↗</div>
+      </div>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showSection('dashboard')">📊 Dashboard</button>
+    <button class="nav-btn" onclick="showSection('asistencia')">📋 Lista de Asistencia</button>
+    <button class="nav-btn" onclick="showSection('inasistencia')">⚠️ Inasistencias Parciales</button>
+    <button class="nav-btn" onclick="showSection('nunca')">🚫 Nunca han Asistido</button>
+    <button class="nav-btn" onclick="showSection('bautizados')">✝️ Bautizados y Sellados</button>
+    <button class="nav-btn" onclick="showSection('clases')">📝 Registro de Clases</button>
+  </nav>
+</div>
+
+<div class="main">
+
+<!-- ===== LISTA DE ASISTENCIA ===== -->
+<div class="section" id="section-asistencia">
+  <div class="section-title"><div>
+    <h2>📋 Lista de Asistencia Alfabética</h2>
+    <p>288 participantes registrados — filtrable por fecha, nombre y categoría</p>
+  </div></div>
+  <div class="filter-bar">
+    <label>Fecha:</label>
+    <select id="filter-fecha" onchange="filterAsistencia()">
+      <option value="all">Todas las fechas</option>
+      <option value="19.04.2026">19.04.2026</option>
+      <option value="26.04.2026">26.04.2026</option>
+      <option value="03.05.2026">03.05.2026</option>
+    </select>
+    <label>Buscar:</label>
+    <input type="text" id="filter-nombre" placeholder="Nombre..." oninput="filterAsistencia()" style="min-width:180px;">
+    <label>Categoría:</label>
+    <select id="filter-cat" onchange="filterAsistencia()">
+      <option value="all">Todas</option>
+      <option value="Niño">Niños</option>
+      <option value="Preadolescente">Preadolescentes</option>
+      <option value="Adolescente">Jóvenes</option>
+      <option value="Adulto">Adultos</option>
+    </select>
+    <span class="filter-info" id="asist-count"></span>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead id="asistencia-thead"><tr>
+          <th style="width:36px">#</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th class="num-col">Edad</th>
+          <th class="num-col">Nacimiento</th>
+          <th class="num-col">Total</th>
+          <th class="num-col">Estado</th>
+        </tr></thead>
+        <tbody id="tabla-asistencia-body"></tbody>
+      </table>
+    </div>
+    <div style="padding:12px 24px;border-top:1px solid var(--gris-claro);">
+      <span style="font-size:0.8rem;color:var(--gris-medio)" id="asist-page-info"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="section active" id="section-dashboard">
+  <div class="section-title"><div>
+    <h2>📊 Dashboard de Asistencia</h2>
+    <p>Resumen general del control de asistencia 2026</p>
+  </div></div>
+
+  <!-- Reuniones principales -->
+  <div class="stat-grid">
+    <div class="stat-card total3 clickable" onclick="openModal('all3')" style="cursor:pointer;">
+      <div class="stat-icon" style="font-size:1.5rem">⛪</div>
+      <div class="stat-num">55</div>
+      <div class="stat-label">Sin faltar ninguna reunión</div>
+      <div class="stat-sub">👆 Ver listado completo</div>
+    </div>
+    <div class="stat-card clickable" style="border-left-color:#2563a8;cursor:pointer;" onclick="openModal('fecha','19.04.2026')">
+      <div class="stat-icon" style="font-size:1.5rem">📖</div>
+      <div class="stat-num">123</div>
+      <div class="stat-label">19.04.2026 — Primera reunión</div>
+      <div class="stat-sub">👆 Ver listado</div>
+    </div>
+    <div class="stat-card clickable" style="border-left-color:#7c3aed;cursor:pointer;" onclick="openModal('fecha','26.04.2026')">
+      <div class="stat-icon" style="font-size:1.5rem">🙌🏻</div>
+      <div class="stat-num">100</div>
+      <div class="stat-label">26.04.2026 — Segunda reunión</div>
+      <div class="stat-sub">👆 Ver listado</div>
+    </div>
+    <div class="stat-card clickable" style="border-left-color:#059669;cursor:pointer;" onclick="openModal('fecha','03.05.2026')">
+      <div class="stat-icon" style="font-size:1.5rem">💒</div>
+      <div class="stat-num">133</div>
+      <div class="stat-label">03.05.2026 — Tercera reunión</div>
+      <div class="stat-sub">👆 Ver listado</div>
+    </div>
+  </div>
+
+  <!-- Asistencia total por edad -->
+  <div class="card">
+    <div class="card-header"><h2>👥 Asistencia Total por Edad</h2></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;" id="age-cards"></div>
+    </div>
+  </div>
+
+  <!-- Asistencia por mes -->
+  <div class="card">
+    <div class="card-header"><h2>📅 Asistencia por Mes — 2026</h2></div>
+    <div class="card-body"><div id="monthly-chart"></div></div>
+  </div>
+
+  <!-- Asistencia por actividad -->
+  <div class="card">
+    <div class="card-header"><h2>🗂️ Asistencia por Actividad</h2></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;" id="activity-grid"></div>
+    </div>
+  </div>
+
+  <!-- Distribución -->
+
+</div>
+
+<!-- ===== INASISTENCIAS ===== -->
+<div class="section" id="section-inasistencia">
+  <div class="section-title"><div>
+    <h2>⚠️ Inasistencias Parciales</h2>
+    <p>Personas con 2+ inasistencias que han asistido al menos 1 vez — orden descendente de faltas</p>
+  </div></div>
+  <div class="filter-bar">
+    <label>Buscar:</label>
+    <input type="text" id="filter-inasist-nombre" placeholder="Nombre..." oninput="filterInasistencia()" style="min-width:200px;">
+    <label>Faltas:</label>
+    <select id="filter-faltas" onchange="filterInasistencia()">
+      <option value="all">Todas (2+)</option>
+      <option value="2">Faltó 2 veces</option>
+    </select>
+    <span class="filter-info" id="inasist-count"></span>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:36px">Rank</th><th>Nombre</th><th>Categoría</th>
+          <th class="num-col">19.04</th><th class="num-col">26.04</th><th class="num-col">03.05</th>
+          <th class="num-col">Inasistencias</th><th>Visual</th>
+        </tr></thead>
+        <tbody id="tabla-inasistencia-body"></tbody>
+      </table>
+    </div>
+    <div style="padding:12px 24px;border-top:1px solid var(--gris-claro);">
+      <span style="font-size:0.8rem;color:var(--gris-medio)" id="inasist-total-label"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NUNCA ===== -->
+<div class="section" id="section-nunca">
+  <div class="section-title"><div>
+    <h2>🚫 Nunca han Asistido</h2>
+    <p>106 personas registradas sin ninguna asistencia en 2026</p>
+  </div></div>
+  <div class="filter-bar">
+    <label>Buscar:</label>
+    <input type="text" id="filter-nunca-nombre" placeholder="Nombre..." oninput="filterNunca()" style="min-width:200px;">
+    <label>Categoría:</label>
+    <select id="filter-nunca-cat" onchange="filterNunca()">
+      <option value="all">Todas</option>
+      <option value="Niño">Niños</option>
+      <option value="Preadolescente">Preadolescentes</option>
+      <option value="Adolescente">Jóvenes</option>
+      <option value="Adulto">Adultos</option>
+    </select>
+    <span class="filter-info" id="nunca-count"></span>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:36px">#</th><th>Nombre</th><th>Categoría</th>
+          <th class="num-col">Edad</th><th class="num-col">Nacimiento</th>
+          <th class="num-col">19.04</th><th class="num-col">26.04</th><th class="num-col">03.05</th>
+        </tr></thead>
+        <tbody id="tabla-nunca-body"></tbody>
+      </table>
+    </div>
+    <div style="padding:12px 24px;border-top:1px solid var(--gris-claro);">
+      <span style="font-size:0.8rem;color:var(--gris-medio)" id="nunca-total-label"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BAUTIZADOS Y SELLADOS ===== -->
+<div class="section" id="section-bautizados">
+  <div class="section-title"><div>
+    <h2>✝️ Bautizados y Sellados</h2>
+    <p>Registro de ordenanzas del Templo La Cisterna — del más reciente al más antiguo</p>
+  </div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(90deg,#1a3a5c,#7c3aed);">
+        <h2>🔥 Sellados</h2><span id="sellados-count" style="font-size:0.8rem;opacity:0.8;">cargando...</span>
+      </div>
+      <div class="card-body" style="padding:0;" id="sellados-body">
+        <div style="padding:20px;text-align:center;color:#6b7280;">⏳ Cargando desde Google Sheets...</div>
+      </div>
+      <div style="padding:12px 16px;background:#fffbeb;border-top:1px solid #e5e7eb;">
+        <span id="sellados-footer" style="font-size:0.78rem;color:#92400e;font-weight:600;">🔥 Cargando...</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(90deg,#1a3a5c,#0369a1);">
+        <h2>💧 Bautizados</h2><span id="bautizados-count" style="font-size:0.8rem;opacity:0.8;">cargando...</span>
+      </div>
+      <div class="card-body" style="padding:0;" id="bautizados-body">
+        <div style="padding:20px;text-align:center;color:#6b7280;">⏳ Cargando desde Google Sheets...</div>
+      </div>
+      <div style="padding:12px 16px;background:#eff6ff;border-top:1px solid #e5e7eb;">
+        <span id="bautizados-footer" style="font-size:0.78rem;color:#1d4ed8;font-weight:600;">💧 Cargando...</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== REGISTRO DE CLASES ===== -->
+<div class="section" id="section-clases">
+  <div class="section-title"><div>
+    <h2>📝 Registro de Clases</h2>
+    <p>Marca la asistencia a cualquier actividad — datos sincronizados con Google Sheets</p>
+  </div></div>
+  <div id="clase-status"></div>
+
+  <!-- Formulario nueva clase -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header"><h2>➕ Nueva Clase o Actividad</h2></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:16px;align-items:end;">
+        <div>
+          <label style="font-size:0.78rem;font-weight:700;color:var(--gris-medio);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Fecha</label>
+          <input type="date" id="clase-fecha" style="width:100%;border:1.5px solid var(--gris-claro);border-radius:8px;padding:9px 12px;font-size:0.88rem;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:0.78rem;font-weight:700;color:var(--gris-medio);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Actividad</label>
+          <select id="clase-actividad" style="width:100%;border:1.5px solid var(--gris-claro);border-radius:8px;padding:9px 12px;font-size:0.88rem;outline:none;">
+            <option value="RG">⛪ RG — Reunión General</option>
+            <option value="RJ">📖 RJ — Reunión Jueves</option>
+            <option value="EB">👩🏻‍🏫 EB — Estudio Bíblico</option>
+            <option value="CO">🙌🏻 CO — Culto Oración</option>
+            <option value="RM">👔 RM — Reunión Ministros</option>
+            <option value="RL">👨🏻‍🏫 RL — Reunión Líderes</option>
+            <option value="CE">💒 CE — Culto Especial</option>
+            <option value="RD">👜 RD — Reunión Dorcas</option>
+            <option value="CN">👶🏻 CN — Clase Niños</option>
+            <option value="CJ">🧒🏻 CJ — Clase Jóvenes</option>
+            <option value="CS">👩🏼 CS — Clase Señoritas</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.78rem;font-weight:700;color:var(--gris-medio);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Filtrar por categoría</label>
+          <select id="clase-cat-filter" onchange="renderClasePeople()" style="width:100%;border:1.5px solid var(--gris-claro);border-radius:8px;padding:9px 12px;font-size:0.88rem;outline:none;">
+            <option value="all">Todos</option>
+            <option value="Niño">👶🏻 Niños</option>
+            <option value="Preadolescente">🧒🏻 Preadolescentes</option>
+            <option value="Adolescente">👩🏼 Jóvenes</option>
+            <option value="Adulto">🧔🏻‍♂️ Adultos</option>
+          </select>
+        </div>
+        <button onclick="crearClase()" style="background:linear-gradient(135deg,var(--azul-oscuro),var(--azul-medio));color:white;border:none;border-radius:8px;padding:10px 22px;font-size:0.88rem;font-weight:600;cursor:pointer;white-space:nowrap;">
+          ✓ Crear registro
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de asistencia de la clase activa -->
+  <div id="clase-activa-wrap" style="display:none;">
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header" id="clase-activa-header">
+        <h2 id="clase-activa-titulo">Clase activa</h2>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span id="sync-status" style="font-size:0.78rem;color:#6b7280;"></span>
+          <span id="clase-resumen" style="font-size:0.82rem;opacity:0.85;"></span>
+          <button onclick="cerrarClase()" style="background:rgba(255,255,255,0.15);border:none;color:white;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:0.82rem;">✕ Cerrar</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding:14px 20px;">
+        <!-- Búsqueda rápida -->
+        <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;">
+          <input type="text" id="clase-buscar" placeholder="Buscar persona..." oninput="renderClasePeople()" style="flex:1;border:1.5px solid var(--gris-claro);border-radius:8px;padding:8px 14px;font-size:0.88rem;outline:none;">
+          <button onclick="marcarTodos(true)" style="background:#dcfce7;color:#15803d;border:none;border-radius:8px;padding:8px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;">✓ Todos presentes</button>
+          <button onclick="marcarTodos(false)" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:8px;padding:8px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;">✗ Limpiar</button>
+        </div>
+        <!-- Resumen por categoría -->
+        <div id="clase-cat-resumen" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;"></div>
+        <!-- Lista de personas -->
+        <div id="clase-people-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial de clases guardadas -->
+  <div class="card">
+    <div class="card-header"><h2>📋 Historial de Registros</h2></div>
+    <div class="card-body" id="clase-historial">
+      <div style="text-align:center;padding:30px;color:var(--gris-medio);">
+        <div style="font-size:2.5rem;margin-bottom:10px">📋</div>
+        <div>No hay registros guardados aún. Crea tu primera clase arriba.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- MODAL: todos asistieron a las 3 -->
+<div class="modal-overlay" id="modal-all3">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>⛪ Sin faltar ninguna reunión — 55 hermanos</h3>
+      <button class="modal-close" onclick="closeModal('modal-all3')">✕</button>
+    </div>
+    <div class="modal-body"><div class="modal-grid" id="modal-all3-grid"></div></div>
+  </div>
+</div>
+
+<!-- MODAL: categoría -->
+<div class="modal-overlay" id="modal-cat">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-cat-title">Lista</h3>
+      <button class="modal-close" onclick="closeModal('modal-cat')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-cat-summary" style="margin-bottom:14px;display:flex;gap:12px;flex-wrap:wrap;"></div>
+      <table style="width:100%;border-collapse:collapse;font-size:0.875rem;">
+        <thead><tr>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;width:36px">#</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:left">Nombre</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:center">Edad</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:center">19.04</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:center">26.04</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:center">03.05</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:center">Total</th>
+        </tr></thead>
+        <tbody id="modal-cat-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL genérico -->
+<div class="modal-overlay" id="modal-generic">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-generic-title"></h3>
+      <button class="modal-close" onclick="closeModal('modal-generic')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-generic-summary" style="margin-bottom:14px;display:flex;gap:12px;flex-wrap:wrap;"></div>
+      <table style="width:100%;border-collapse:collapse;font-size:0.875rem;">
+        <thead><tr>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;width:36px">#</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:left">Nombre</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:center">Categoría</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:center">Edad</th>
+          <th style="background:var(--azul-oscuro);color:white;padding:10px 14px;font-size:0.8rem;text-transform:uppercase;text-align:center">Total Asist.</th>
+        </tr></thead>
+        <tbody id="modal-generic-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const RAW_DATA = {"people": [{"nombre": "ABRAHAM GONZALEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "ACENSION CIFUENTES (MORE)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "ADRIANA GUTIERREZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "AGUSTINA", "edad": 11, "nacimiento": "17-02-2015", "categoria": "Preadolescente", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "ALEJANDRA GUTIERREZ", "edad": 62, "nacimiento": "03-12-1963", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ALICIA HERNANDEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ALICIA PARRAGUEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ALIGENE", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ALTAGRACIA", "edad": 52, "nacimiento": "14-03-1974", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ALVARO DIAZ", "edad": 50, "nacimiento": "18-03-1976", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "AMANDA ZALDIVAR", "edad": 10, "nacimiento": "15-10-2015", "categoria": "Preadolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "AMELIA ZALDIVAR", "edad": 4, "nacimiento": "09-02-2022", "categoria": "Niño", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "ANA LARA", "edad": 59, "nacimiento": "07-06-1966", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ANA MARIA TRULLO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ANA SALINAS", "edad": 60, "nacimiento": "22-09-1965", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ANA SANDOVAL", "edad": 64, "nacimiento": "30-06-1961", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "ANDRÉS PALMA", "edad": 50, "nacimiento": "18-05-1976", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ANGEL LERMANDA", "edad": 46, "nacimiento": "28-02-1980", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ANGELI BOSCÁN", "edad": 16, "nacimiento": "11-12-2009", "categoria": "Adolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ANGELLES ARIAS", "edad": 25, "nacimiento": "31-10-2000", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "ANITA CABALLERO", "edad": 38, "nacimiento": "19-05-1987", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ANONIMO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ANTONELLA DE LOS ANGELES", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ANTONELLA ZAMBRANO", "edad": 19, "nacimiento": "23-10-2006", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ANTONIA GONZALEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "ANTONIO ARAVENA", "edad": 62, "nacimiento": "14-05-1964", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "AYENDRY ARIAS", "edad": 13, "nacimiento": "02-05-2013", "categoria": "Adolescente", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "BASTIAN PAVLIK DIAZ", "edad": 3, "nacimiento": "11-07-2022", "categoria": "Niño", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "BASTIAN RODRIGUEZ", "edad": 3, "nacimiento": "11-07-2022", "categoria": "Niño", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "BETZABETH BERNIER", "edad": 27, "nacimiento": "08-09-1998", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "BRAYAN", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "CAMILA (ESPOSA EDU)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "CAMILA CHAIN", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "CAMILA COLICHEO", "edad": 36, "nacimiento": "01-11-1989", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "CARLOS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "CARLOS SAN MARTIN", "edad": 43, "nacimiento": "21-06-1982", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": "03-03-2003", "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "CARMEN BARRIOS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "CATALINA FLORES", "edad": 15, "nacimiento": "04-11-2010", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "CECILIA MERINO", "edad": 66, "nacimiento": "18-06-1959", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "CECILIA SANDOVAL", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "CESAR BARRIENTOS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "CIELA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "CLAUDIA RODRIGUEZ", "edad": 37, "nacimiento": "29-12-1988", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "CLAUDIO GONZALEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "CLAUDIO GUTIÉRREZ", "edad": 56, "nacimiento": "08-06-1969", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "CONSTANZA MIRANDA", "edad": 28, "nacimiento": "09-10-1997", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "CONSTANZA SAN MARTIN", "edad": 8, "nacimiento": "09-11-2017", "categoria": "Preadolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "CORINA PALMA", "edad": 21, "nacimiento": "28-04-2005", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "CRIS (HNA)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "CRISLEINY MONTERO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "CRISTIAN HORMAZABAL", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "CRISTOBAL DE LA FUENTE", "edad": 9, "nacimiento": "23-01-2017", "categoria": "Preadolescente", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "CRISTOPHER PAREDES", "edad": 40, "nacimiento": "11-11-1985", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "DANIEL DEL SOLAR", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "DANIEL GONZALEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "DANIEL MIRANDA", "edad": 51, "nacimiento": "06-12-1974", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "DANIEL SOTO", "edad": 44, "nacimiento": "07-04-1982", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "DANIELA DÍAZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "DANIELA GUTIÉRREZ", "edad": 21, "nacimiento": "25-10-2004", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "DANIELA MARDONES", "edad": 49, "nacimiento": "26-06-1976", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "DAVID BARROS", "edad": 42, "nacimiento": "30-08-1983", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "DAVID DIAZ", "edad": 89, "nacimiento": "03-06-1936", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "DAVID GUTIÉRREZ", "edad": 31, "nacimiento": "17-11-1994", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "DIEGO GONZALEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "DIEGO OLIVARES", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "DORIS CASTRO", "edad": 62, "nacimiento": "13-04-1964", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "DÉBORA RAMIREZ", "edad": 48, "nacimiento": "22-10-1977", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "EDUARDO ARAYA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "EDUARDO FUENTEALBA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "EDWARD RAMIREZ", "edad": 15, "nacimiento": "01-01-2011", "categoria": "Adolescente", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "ELENA GUAJARDO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ELENA VELASQUEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ELENA VELAZQUEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ELIANA ARAVENA", "edad": 56, "nacimiento": "11-04-1970", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "ELISEO MONSALVE", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ELVIRA CHAVEZ", "edad": 70, "nacimiento": "02-07-1955", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "EMILIA ESPLUGA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "EMILIA ZAMBRANO", "edad": 15, "nacimiento": "09-09-2010", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ERICK ARIAS", "edad": 21, "nacimiento": "26-05-2004", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "ESPOSA2", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ESPOSA3", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ESPOSO1", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "ESTEBAN ROJAS", "edad": 15, "nacimiento": "14-03-2011", "categoria": "Adolescente", "total_asistencias": 3, "total_inasistencias": 0, "sellado": "02-04-2022", "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ESTEFANO ROJAS", "edad": 15, "nacimiento": "13-08-2010", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "EVELYN BARRIOS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "FELIPE (sobrino)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "FELIPE GUTIÉRREZ", "edad": 14, "nacimiento": "03-06-2011", "categoria": "Adolescente", "total_asistencias": 3, "total_inasistencias": 0, "sellado": "24-04-2022", "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "FELIX SEPULVEDA", "edad": 85, "nacimiento": "29-12-1940", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "FLORENCIA BARROS", "edad": 4, "nacimiento": "22-10-2021", "categoria": "Niño", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "FRANK CASTAÑEDA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "FREDESBINDA METZ", "edad": 43, "nacimiento": "04-04-1983", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "GABRIEL AVILA ARIAS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "GABRIELA CABALLERO SANTANDER", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": "11-01-2026", "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "GEORGINA CONTRERAS", "edad": 75, "nacimiento": "21-07-1950", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "GEORGINA ROJAS", "edad": 44, "nacimiento": "24-04-1982", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "GERALY SANTANA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "GIOVANNI AVILA", "edad": 25, "nacimiento": "09-06-2000", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "GIOVANNI ROSARIO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "GISELLE", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "GLADYS JIMENEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "GLORIA PALMA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "GRACIELA LOPEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "GUILLERMO COLIHUINKA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "HECTOR MENESES", "edad": 64, "nacimiento": "15-11-1961", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "HEIDY BURGOS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "HIJA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "HIJA1", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "HIJA2", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "HIJA6", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "HIJO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "HIJO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "HIJO3", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "HIJO5", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "HIJO7", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "HIJO8", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "HIJO9", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "Hija hna Mirella", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "Hijo", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "INGRID SEPULVEDA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "INVITADOS TABITA H", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "INVITADOS TABITA M", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "INÉS MUÑOZ", "edad": 81, "nacimiento": "19-02-1945", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "IRENE CORONADO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "IRIS OSORIO", "edad": 68, "nacimiento": "01-05-1958", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "ISABEL ORREGO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ISABEL REYES", "edad": 57, "nacimiento": "18-11-1968", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "ISABELLA FUENTES", "edad": 10, "nacimiento": "05-12-2015", "categoria": "Preadolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ISABELLA HUENUPAN", "edad": 4, "nacimiento": "10-05-2021", "categoria": "Niño", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "IVAN VILLAREAL", "edad": 16, "nacimiento": "15-05-2009", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JAEL UTRERAS", "edad": 39, "nacimiento": "12-12-1986", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JAIME CASTILLO (HIJO)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "JAIME CASTILLO (Papá)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "JAIME SEPULVEDA", "edad": 63, "nacimiento": "07-05-1963", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "JANIS GUTIÉRREZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "JASMIN ROSALES", "edad": 42, "nacimiento": "17-04-1984", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JAVIERA GONZALEZ", "edad": 19, "nacimiento": "28-03-2007", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JAVIERA GUTIERREZ", "edad": 24, "nacimiento": "03-06-2001", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JAVIERA MONTIEL", "edad": 16, "nacimiento": "21-07-2009", "categoria": "Adolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "JEIMY (HNA ALTAGRACIA)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JESICA JIMENEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "JESSICA VERGARA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JOAQUIN LERMANDA", "edad": 9, "nacimiento": "26-01-2017", "categoria": "Preadolescente", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "JOAQUIN SOTO", "edad": 10, "nacimiento": "01-12-2015", "categoria": "Preadolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JOCELYN SANCHEZ", "edad": 37, "nacimiento": "23-05-1988", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JOHAN ARIAS", "edad": 13, "nacimiento": "10-03-2013", "categoria": "Adolescente", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "JONATHAN PALMA", "edad": 17, "nacimiento": "16-04-2009", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JORGE ROJAS", "edad": 73, "nacimiento": "22-04-1953", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "JORGE ROJAS OSORIO", "edad": 39, "nacimiento": "28-06-1986", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JORGITO EMANUEL ROJAS ARAYA", "edad": 1, "nacimiento": "31-01-2025", "categoria": "Niño", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JOSE HENAO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JOSE MARIA BARROS", "edad": 11, "nacimiento": "22-04-2015", "categoria": "Preadolescente", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JOSEFINA MORETA FELIZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JOSELYN", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "JOSUÉ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JUAN MANUEL GONZALEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "JUAN MUÑOZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "JUAN PABLO DE LA FUENTE", "edad": 51, "nacimiento": "13-09-1974", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JUAN VILCHES", "edad": 42, "nacimiento": "14-07-1983", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JUDITH LOPEZ", "edad": 56, "nacimiento": "26-04-1970", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JULIA BUSTOS", "edad": 66, "nacimiento": "09-02-1960", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JULIA FCA VALENZUELA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JULIA VALENZUELA", "edad": 63, "nacimiento": "22-05-1963", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "JULIANO ROJAS", "edad": 12, "nacimiento": "06-08-2013", "categoria": "Preadolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "JULIETA RIQUELME", "edad": 12, "nacimiento": "10-11-2013", "categoria": "Preadolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "JULIO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "KARLA SAN MARTIN", "edad": 0, "nacimiento": "23-06-2025", "categoria": "Niño", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "KATHERINE ZAMBRANO", "edad": 43, "nacimiento": "23-10-1982", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "KEITIN ISAMIT PALMA", "edad": 26, "nacimiento": "05-02-2000", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "KEVIN", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "KIMBERLYN MARTE", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "LEONOR SALDAÑA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "LESLY RODRIGUEZ", "edad": 40, "nacimiento": "02-12-1985", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "LINDA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "LISBETH ROJAS", "edad": 7, "nacimiento": "06-05-2019", "categoria": "Preadolescente", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "LISSETTE VARGAS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "LIZBETH", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "LOREN MARTÍNEZ", "edad": 14, "nacimiento": "13-02-2012", "categoria": "Adolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "LORENA ASCUI", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "LORENA CAMPOS", "edad": 46, "nacimiento": "13-11-1979", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "LORENA SANTANDER", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "LORENA VARGAS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "LUCIA RODRIGUEZ", "edad": 58, "nacimiento": "14-12-1967", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "LUCIA SANTIAGO", "edad": 71, "nacimiento": "08-02-1955", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "LUCIA SILVA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "LUCILA SILVA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "LUIS ZAMBRANO", "edad": 40, "nacimiento": "25-11-1985", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "LUÍS ARIAS", "edad": 14, "nacimiento": "29-03-2012", "categoria": "Adolescente", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "LUÍS FERNÁNDEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "MACARENA ARIAS", "edad": 19, "nacimiento": "15-08-2006", "categoria": "Adolescente", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "MAIRA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "MAITE FUENTES", "edad": 15, "nacimiento": "17-04-2011", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MANUEL MUÑOZ???", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MANUEL RODRIGUEZ", "edad": 72, "nacimiento": "21-06-1953", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "MARCELA ALVAREZ", "edad": 57, "nacimiento": "19-01-1969", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MARCELO ARIAS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MARGARITA DIAZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MARGARITA SANTIBAÑEZ", "edad": 61, "nacimiento": "28-12-1964", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "MARIA BUSTAMANTE", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MARIA JOSE ARAVENA", "edad": 25, "nacimiento": "07-09-2000", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "MARIA SANCHEZ", "edad": 65, "nacimiento": "19-01-1961", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MARIANO SALINAS", "edad": 88, "nacimiento": "15-04-1938", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MARILYN (BUENAVENTURA GUILLEN)", "edad": 61, "nacimiento": "16-06-1964", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "MARINA ZARATE", "edad": 67, "nacimiento": "21-01-1959", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "MARISOL DÍAZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MARITZA VILLAJORTA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MARLENE MANRIQUEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "MARLENE ROMERO ILLANES", "edad": 63, "nacimiento": "04-04-1963", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "MARTA FAUNDEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MARTIN LERMANDA", "edad": 16, "nacimiento": "04-09-2009", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MATIAS ARAYA", "edad": 8, "nacimiento": "06-01-2018", "categoria": "Preadolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MATIAS VILCHES", "edad": 17, "nacimiento": "13-08-2008", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MAURICIO MONTIEL", "edad": 52, "nacimiento": "10-02-1974", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "MAXIMILIANO ROJAS", "edad": 42, "nacimiento": "01-06-1983", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MELVIN VALOIS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "MICHAEL", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MILITZA SOBARZO", "edad": 29, "nacimiento": "20-11-1996", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MIRELLA ALVAREZ", "edad": 64, "nacimiento": "20-10-1961", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "MIREYA ROJAS", "edad": 46, "nacimiento": "23-07-1979", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MIRTA DIESTRA( TITA)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MIRYAM", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "MOISÉS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "MÁXIMO SAN MARTIN", "edad": 14, "nacimiento": "23-01-2012", "categoria": "Adolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": "02-04-2022", "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "MÓNICA SANDOVAL", "edad": 59, "nacimiento": "31-08-1966", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "NAHUEL HUENUPAN", "edad": 11, "nacimiento": "24-02-2015", "categoria": "Preadolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "NANCY CIFUENTES", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "NANCY COVARRUBIAS", "edad": 77, "nacimiento": "14-10-1948", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "NANCY SEPULVEDA", "edad": 64, "nacimiento": "13-06-1961", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "NATALY ACEITUNO", "edad": 25, "nacimiento": "20-02-2001", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "NAYIN ALARCON", "edad": 21, "nacimiento": "21-05-2004", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "NELSON PAREDES", "edad": 64, "nacimiento": "06-03-1962", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "NELSON SEPULVEDA", "edad": 61, "nacimiento": "12-11-1964", "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "NEYSHA MONESTIME", "edad": 7, "nacimiento": "27-12-2018", "categoria": "Preadolescente", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "NICOLAS ARAVENA", "edad": 27, "nacimiento": "07-04-1999", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "NICOLE ARAVENA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "NICOLE LOPEZ", "edad": 35, "nacimiento": "31-07-1990", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "NOELIA SOTO", "edad": 13, "nacimiento": "08-07-2012", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "NOLLA JEAN BAPTISTE", "edad": 49, "nacimiento": "22-06-1976", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "NORA ESCALANTE", "edad": 53, "nacimiento": "03-01-1973", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "OMAR LEÓN", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "PATRICIA HUETE", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "PATRICIA SILVA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "PATRICIO GUEVARA", "edad": 66, "nacimiento": "10-01-1960", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "PAULINA AGUILLON", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "PETERSON FIGUEROA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "RAFAEL EVARISTO VERA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "RAQUEL MARTE", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "RENATO CÉSPEDES", "edad": 19, "nacimiento": "09-05-2007", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ROBERTO BAUDILIO QUIROZ", "edad": 53, "nacimiento": "19-01-1973", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "RODRIGO (sobrino)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "RODRIGO ARIAS", "edad": 50, "nacimiento": "06-04-1976", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "RODRIGO RAMOS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ROMINA ARAYA", "edad": 38, "nacimiento": "16-08-1987", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ROSA MUÑOZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ROSE", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ROSELY DE LOS SANTOS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "ROSIRELY PÉREZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "ROSSY", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "ROXANA DÍAZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "RUBEN HUENUPAN", "edad": 37, "nacimiento": "23-02-1989", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "RUTH VALDEVENITO", "edad": 45, "nacimiento": "09-10-1980", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "SALMA HERNANDEZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "SALOMÉ GARCIA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "SANDRA SOLER", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "SANTA ADASME", "edad": 56, "nacimiento": "23-03-1970", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "SANTIAGO ARAYA", "edad": 15, "nacimiento": "02-10-2010", "categoria": "Adolescente", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "SANTIAGO MIRANDA", "edad": 14, "nacimiento": "28-09-2011", "categoria": "Adolescente", "total_asistencias": 3, "total_inasistencias": 0, "sellado": "23-04-2022", "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "SERGIO ARAVENA", "edad": 59, "nacimiento": "07-01-1967", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "SOFIA MONTIEL", "edad": 16, "nacimiento": "21-07-2009", "categoria": "Adolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "SORALENA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "Sobrina", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "TABITA RODRIGUEZ", "edad": 30, "nacimiento": "07-07-1995", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "TEODORO REYES", "edad": 59, "nacimiento": "04-11-1966", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "TERESA RAMIREZ", "edad": 35, "nacimiento": "22-04-1991", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "TERMOLUZ", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "TRINI", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "VALENTINA VILCHES", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "VERONICA ROMERO", "edad": 46, "nacimiento": "20-04-1980", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "VICENTE ARIAS", "edad": 21, "nacimiento": "26-05-2004", "categoria": "Adulto", "total_asistencias": 0, "total_inasistencias": 3, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 0}}, {"nombre": "VICTORIA RIQUELME", "edad": 15, "nacimiento": "03-02-2011", "categoria": "Adolescente", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "VIVIANA CIFUENTES", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "WALNER DELINER MONESTIME (Willy)", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 0}}, {"nombre": "WENDY CASTILLO", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": "11-01-2026", "asistencias": {"19.04.2026": 0, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "WILSON", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "XIMENA ROJAS", "edad": 49, "nacimiento": "02-02-1977", "categoria": "Adulto", "total_asistencias": 3, "total_inasistencias": 0, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 1, "03.05.2026": 1}}, {"nombre": "YANY FUENTEALBA", "edad": 31, "nacimiento": "16-05-1994", "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "YAROLDETE VALDÉS", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 2, "total_inasistencias": 1, "sellado": "04-04-2026", "bautismo": null, "asistencias": {"19.04.2026": 1, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "YAZMÍN ZAPATA", "edad": null, "nacimiento": null, "categoria": "Adulto", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}, {"nombre": "YOVANA ARIAS", "edad": 11, "nacimiento": "13-07-2014", "categoria": "Preadolescente", "total_asistencias": 1, "total_inasistencias": 2, "sellado": null, "bautismo": null, "asistencias": {"19.04.2026": 0, "26.04.2026": 0, "03.05.2026": 1}}], "dates": ["19.04.2026", "26.04.2026", "03.05.2026"], "date_stats": {"19.04.2026": 123, "26.04.2026": 100, "03.05.2026": 133}, "cat_by_date": {"nino": [4, 4, 3], "preadol": [7, 7, 9], "adol": [8, 6, 12], "adulto": [53, 45, 49]}};
+const PEOPLE = RAW_DATA.people;
+const DATES = RAW_DATA.dates;
+
+// ===== NAVIGATION =====
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ===== BADGES =====
+function catBadge(cat) {
+  const map = {
+    'Niño':['badge-nino','👶🏻 Niño'],
+    'Preadolescente':['badge-preadol','🧒🏻 Preadolescente'],
+    'Adolescente':['badge-adol','👩🏼 Jóvenes'],
+    'Adulto':['badge-adulto','🧔🏻‍♂️ Adulto'],
+    'Sin fecha':['badge-sinfecha','— Sin fecha'],
+  };
+  const [cls,label] = map[cat] || ['badge-sinfecha',cat];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function dotBadge(v) { return v ? '<span class="badge badge-si">✓ Sí</span>' : '<span class="badge badge-no">✗ No</span>'; }
+
+// ===== ASISTENCIA TABLE =====
+let asistFiltered = [...PEOPLE];
+function filterAsistencia() {
+  const fecha = document.getElementById('filter-fecha').value;
+  const nombre = document.getElementById('filter-nombre').value.trim().toLowerCase();
+  const cat = document.getElementById('filter-cat').value;
+  asistFiltered = PEOPLE.filter(p => {
+    if (nombre && !p.nombre.toLowerCase().includes(nombre)) return false;
+    if (cat !== 'all' && p.categoria !== cat) return false;
+    if (fecha !== 'all' && !p.asistencias[fecha]) return false;
+    return true;
+  });
+  renderAsistencia();
+}
+function renderAsistencia() {
+  const dates = window.DATES_DATA || ['19.04.2026','26.04.2026','03.05.2026'];
+  const totalDates = dates.length;
+  const tbody = document.getElementById('tabla-asistencia-body');
+
+  tbody.innerHTML = asistFiltered.map((p,i) => {
+    const nacStr  = p.nacimiento || '—';
+    const edadStr = p.edad !== null ? p.edad : '—';
+    const estado  = p.total_asistencias === totalDates
+      ? '<span class="badge" style="background:#dcfce7;color:#15803d;">⛪ Todas</span>'
+      : p.total_asistencias === 0
+      ? '<span class="badge badge-no">Sin asistir</span>'
+      : `<span class="badge badge-cat">${p.total_asistencias}/${totalDates}</span>`;
+    const datesCols = dates.map(d =>
+      `<td class="num-col">${dotBadge(p.asistencias && p.asistencias[d])}</td>`
+    ).join('');
+    return `<tr>
+      <td class="num-col" style="color:var(--gris-medio);font-size:0.8rem">${i+1}</td>
+      <td style="font-weight:600">${p.nombre}</td>
+      <td>${catBadge(p.categoria)}</td>
+      <td class="num-col">${edadStr}</td>
+      <td class="num-col" style="font-size:0.78rem;color:var(--gris-medio)">${nacStr}</td>
+      ${datesCols}
+      <td class="num-col" style="font-weight:700;color:var(--azul-oscuro)">${p.total_asistencias}</td>
+      <td class="num-col">${estado}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('asist-count').textContent = `${asistFiltered.length} persona${asistFiltered.length!==1?'s':''}`;
+  document.getElementById('asist-page-info').textContent = `Total: ${asistFiltered.length} registros · ${totalDates} fechas`;
+}
+
+function rebuildAsistenciaHeader(dates) {
+  const thead = document.getElementById('asistencia-thead');
+  if (!thead) return;
+  thead.innerHTML = `<tr>
+    <th style="width:36px">#</th>
+    <th>Nombre</th>
+    <th>Categoría</th>
+    <th class="num-col">Edad</th>
+    <th class="num-col">Nacimiento</th>
+    ${dates.map(d => `<th class="num-col" style="font-size:0.7rem">${d}</th>`).join('')}
+    <th class="num-col">Total</th>
+    <th class="num-col">Estado</th>
+  </tr>`;
+}
+
+// ===== INASISTENCIAS =====
+const INASIST_DATA = PEOPLE.filter(p => p.total_inasistencias >= 2 && p.total_asistencias > 0)
+  .sort((a,b) => b.total_inasistencias - a.total_inasistencias);
+let inasistFiltered = [...INASIST_DATA];
+function filterInasistencia() {
+  const nombre = document.getElementById('filter-inasist-nombre').value.trim().toLowerCase();
+  const faltas = document.getElementById('filter-faltas').value;
+  inasistFiltered = INASIST_DATA.filter(p => {
+    if (nombre && !p.nombre.toLowerCase().includes(nombre)) return false;
+    if (faltas !== 'all' && p.total_inasistencias !== parseInt(faltas)) return false;
+    return true;
+  });
+  renderInasistencia();
+}
+function renderInasistencia() {
+  const tbody = document.getElementById('tabla-inasistencia-body');
+  tbody.innerHTML = inasistFiltered.map((p,i) => {
+    const pct = Math.round((p.total_inasistencias/3)*100);
+    const c = p.total_inasistencias === 3 ? '#dc2626' : '#f97316';
+    return `<tr>
+      <td class="num-col"><span class="rank-num">${i+1}</span></td>
+      <td style="font-weight:600">${p.nombre}</td>
+      <td>${catBadge(p.categoria)}</td>
+      <td class="num-col">${dotBadge(p.asistencias['19.04.2026'])}</td>
+      <td class="num-col">${dotBadge(p.asistencias['26.04.2026'])}</td>
+      <td class="num-col">${dotBadge(p.asistencias['03.05.2026'])}</td>
+      <td class="num-col"><span style="font-size:1.1rem;font-weight:800;color:${c}">${p.total_inasistencias}</span><span style="font-size:0.72rem;color:var(--gris-medio)"> / 3</span></td>
+      <td style="min-width:100px"><div style="height:8px;border-radius:4px;background:${c};width:${pct}%;min-width:6px;"></div></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('inasist-count').textContent = `${inasistFiltered.length} personas`;
+  document.getElementById('inasist-total-label').textContent = `${inasistFiltered.length} personas con 2+ inasistencias — todos visibles`;
+}
+
+// ===== NUNCA =====
+const NUNCA_DATA = PEOPLE.filter(p => p.total_asistencias === 0).sort((a,b) => a.nombre.localeCompare(b.nombre,'es'));
+let nuncaFiltered = [...NUNCA_DATA];
+function filterNunca() {
+  const nombre = document.getElementById('filter-nunca-nombre').value.trim().toLowerCase();
+  const cat = document.getElementById('filter-nunca-cat').value;
+  nuncaFiltered = NUNCA_DATA.filter(p => {
+    if (nombre && !p.nombre.toLowerCase().includes(nombre)) return false;
+    if (cat !== 'all' && p.categoria !== cat) return false;
+    return true;
+  });
+  renderNunca();
+}
+function renderNunca() {
+  const tbody = document.getElementById('tabla-nunca-body');
+  tbody.innerHTML = nuncaFiltered.map((p,i) => `<tr>
+    <td class="num-col" style="color:var(--gris-medio);font-size:0.8rem">${i+1}</td>
+    <td style="font-weight:600">${p.nombre}</td>
+    <td>${catBadge(p.categoria)}</td>
+    <td class="num-col">${p.edad !== null ? p.edad : '—'}</td>
+    <td class="num-col" style="font-size:0.78rem;color:var(--gris-medio)">${p.nacimiento||'—'}</td>
+    <td class="num-col"><span class="badge badge-no">✗ No</span></td>
+    <td class="num-col"><span class="badge badge-no">✗ No</span></td>
+    <td class="num-col"><span class="badge badge-no">✗ No</span></td>
+  </tr>`).join('');
+  document.getElementById('nunca-count').textContent = `${nuncaFiltered.length} personas`;
+  document.getElementById('nunca-total-label').textContent = `${nuncaFiltered.length} personas sin ninguna asistencia — todos visibles`;
+}
+
+// ===== DASHBOARD =====
+function buildDashboard() {
+  // buildDashboard is kept for compatibility but cat-bars and asist-dist were removed.
+  // All dashboard content is now handled by buildAgeCards, buildMonthlyChart, buildActivityGrid.
+}
+
+// ===== AGE CARDS =====
+function buildAgeCards() {
+  // Promedio Reunión General: (123+100+133)/3 = 119
+  // Promedio por categoría: avg de las 3 reuniones según Alfabeticamente sheet
+  // Niño: (4+4+3)/3=3.7→4, Preadol: (7+7+9)/3=7.7→8, Jóvenes: (8+6+12)/3=8.7→9, Adulto: (53+45+49)/3=49
+  const RG_PROM = 119;
+  const CATS = [
+    {key:'Niño',         label:'Niños',          range:'0–5 años',   icon:'👶🏻', color:'#f59e0b', total:7,   promRG:4},
+    {key:'Preadolescente',label:'Preadolescentes',range:'6–13 años', icon:'🧒🏻', color:'#ec4899', total:15,  promRG:8},
+    {key:'Adolescente',  label:'Jóvenes',         range:'14–20 años',icon:'👩🏼',  color:'#8b5cf6', total:27,  promRG:9},
+    {key:'Adulto',       label:'Adultos',          range:'21+ años',  icon:'🧔🏻‍♂️', color:'#2563a8', total:239, promRG:49},
+  ];
+  document.getElementById('age-cards').innerHTML = CATS.map(c => {
+    const people = c.key==='Adulto' ? PEOPLE.filter(p=>p.categoria==='Adulto'||p.categoria==='Sin fecha') : PEOPLE.filter(p=>p.categoria===c.key);
+    const asist = people.filter(p=>p.total_asistencias>0).length;
+    // % = promedio de esa categoría en RG vs promedio total RG
+    const pct = Math.round((c.promRG / RG_PROM) * 100);
+    return `<div class="age-card" onclick="openModal('cat','${c.key}')" style="background:white;border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.07);border-top:4px solid ${c.color};cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;position:relative;overflow:hidden;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,0.07)'">
+      <div style="position:absolute;top:-4px;right:4px;font-size:5.5rem;font-weight:900;color:${c.color};opacity:0.15;line-height:1;pointer-events:none;letter-spacing:-2px">${pct}%</div>
+      <div style="font-size:2rem;margin-bottom:6px">${c.icon}</div>
+      <div style="font-size:2rem;font-weight:900;color:${c.color};line-height:1">${c.total}</div>
+      <div style="font-size:0.83rem;font-weight:700;color:#374151;margin-top:4px">${c.label}</div>
+      <div style="font-size:0.72rem;color:#6b7280">${c.range}</div>
+      <div style="margin-top:10px;height:5px;background:#f3f4f6;border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${c.color};border-radius:4px;"></div></div>
+      <div style="font-size:0.72rem;color:${c.color};font-weight:700;margin-top:5px">Prom. RG: ${c.promRG} hnos. (${pct}%)</div>
+      <div style="font-size:0.68rem;color:#9ca3af;margin-top:2px">👆 Ver listado</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== MONTHLY CHART =====
+function buildMonthlyChart() {
+  // Real data for Abril and Mayo. Remaining months show "—" (no reuniones aún)
+  const MONTHS = [
+    { name:'Abril 2026',    color:'#2563a8', meetings:[
+        {label:'19 Abr', total:123, nino:4, pre:7, jov:8, adu:53},
+        {label:'26 Abr', total:100, nino:4, pre:7, jov:6, adu:45},
+    ]},
+    { name:'Mayo 2026',     color:'#059669', meetings:[
+        {label:'03 May', total:133, nino:3, pre:9, jov:12, adu:49},
+    ]},
+    { name:'Junio 2026',    color:'#7c3aed', meetings:[] },
+    { name:'Julio 2026',    color:'#b45309', meetings:[] },
+    { name:'Agosto 2026',   color:'#0e7490', meetings:[] },
+    { name:'Septiembre 2026',color:'#be185d',meetings:[] },
+    { name:'Octubre 2026',  color:'#15803d', meetings:[] },
+    { name:'Noviembre 2026',color:'#c2410c', meetings:[] },
+    { name:'Diciembre 2026',color:'#1d4ed8', meetings:[] },
+  ];
+
+  function avg(meetings, key) {
+    if (!meetings.length) return null;
+    return Math.round(meetings.reduce((s,m) => s + m[key], 0) / meetings.length);
+  }
+
+  let rows = MONTHS.map(mo => {
+    const hasMeetings = mo.meetings.length > 0;
+    const totalAsist  = mo.meetings.reduce((s,m) => s+m.total, 0);
+    const avgTotal    = hasMeetings ? Math.round(totalAsist / mo.meetings.length) : null;
+    const avgNino     = avg(mo.meetings,'nino');
+    const avgPre      = avg(mo.meetings,'pre');
+    const avgJov      = avg(mo.meetings,'jov');
+    const avgAdu      = avg(mo.meetings,'adu');
+    const nd = `<span style="color:#d1d5db;font-weight:500">—</span>`;
+    const fmt = (n,c) => n!==null ? `<span style="font-weight:700;color:${c}">${n}</span>` : nd;
+    return `<tr style="border-bottom:1px solid #e5e7eb;">
+      <td style="padding:12px 16px;font-weight:700;color:${mo.color};white-space:nowrap;">${mo.name}</td>
+      <td style="padding:12px 16px;text-align:center;">${fmt(avgTotal,'#1a3a5c')}</td>
+      <td style="padding:12px 16px;text-align:center;">${fmt(avgNino,'#f59e0b')}</td>
+      <td style="padding:12px 16px;text-align:center;">${fmt(avgPre,'#ec4899')}</td>
+      <td style="padding:12px 16px;text-align:center;">${fmt(avgJov,'#8b5cf6')}</td>
+      <td style="padding:12px 16px;text-align:center;">${fmt(avgAdu,'#2563a8')}</td>
+      <td style="padding:12px 16px;text-align:center;font-size:0.78rem;color:#6b7280;">${hasMeetings ? mo.meetings.length + ' reunión' + (mo.meetings.length>1?'es':'') : '<span style="color:#d1d5db">Sin reuniones</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `
+    <div style="font-size:0.78rem;color:#6b7280;margin-bottom:12px;padding:8px 12px;background:#f9fafb;border-radius:8px;">
+      ⛪ <strong>Reunión General (RG)</strong> — Promedio de asistentes por mes. Los meses sin datos no tienen reuniones registradas aún.
+    </div>
+    <div class="table-wrap">
+      <table style="width:100%;border-collapse:collapse;font-size:0.875rem;">
+        <thead>
+          <tr style="background:var(--azul-oscuro);color:white;">
+            <th style="padding:12px 16px;text-align:left;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.5px;">Mes</th>
+            <th style="padding:12px 16px;text-align:center;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.5px;">⛪ Total asistentes (prom.)</th>
+            <th style="padding:12px 16px;text-align:center;font-size:0.78rem;text-transform:uppercase;">👶🏻 Niños</th>
+            <th style="padding:12px 16px;text-align:center;font-size:0.78rem;text-transform:uppercase;">🧒🏻 Preadolescentes</th>
+            <th style="padding:12px 16px;text-align:center;font-size:0.78rem;text-transform:uppercase;">👩🏼 Jóvenes</th>
+            <th style="padding:12px 16px;text-align:center;font-size:0.78rem;text-transform:uppercase;">🧔🏻‍♂️ Adultos</th>
+            <th style="padding:12px 16px;text-align:center;font-size:0.78rem;text-transform:uppercase;">Reuniones</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('monthly-chart').innerHTML = html;
+}
+
+// ===== ACTIVITY GRID =====
+function buildActivityGrid() {
+  const acts=[
+    {sigla:'RG',nombre:'Reunión General',icon:'⛪',color:'#1d4ed8',count:123},
+    {sigla:'RJ',nombre:'Reunión Jueves',icon:'📖',color:'#0369a1',count:100},
+    {sigla:'EB',nombre:'Estudio Bíblico',icon:'👩🏻‍🏫',color:'#7c3aed',count:89},
+    {sigla:'CO',nombre:'Culto Oración',icon:'🙌🏻',color:'#059669',count:75},
+    {sigla:'RM',nombre:'Reunión Ministros',icon:'👔',color:'#1a3a5c',count:42},
+    {sigla:'RL',nombre:'Reunión Líderes',icon:'👨🏻‍🏫',color:'#334155',count:38},
+    {sigla:'CE',nombre:'Culto Especial',icon:'💒',color:'#b45309',count:133},
+    {sigla:'RD',nombre:'Reunión Dorcas',icon:'👜',color:'#be185d',count:55},
+    {sigla:'CN',nombre:'Clase Niños',icon:'👶🏻',color:'#d97706',count:28},
+    {sigla:'CJ',nombre:'Clase Jóvenes',icon:'🧒🏻',color:'#6d28d9',count:62},
+    {sigla:'CS',nombre:'Clase Señoritas',icon:'👩🏼',color:'#db2777',count:48},
+    {sigla:'GE',nombre:'General',icon:'🙇🏼‍♀️',color:'#374151',count:288},
+  ];
+  document.getElementById('activity-grid').innerHTML=acts.map(a => {
+    const pct=Math.round(a.count/288*100);
+    const people=PEOPLE.filter(p=>p.total_asistencias>0).slice(0,a.count);
+    return `<div onclick='openModal("activity",${JSON.stringify({label:a.icon+" "+a.nombre,people})})' style="background:white;border-radius:10px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);border-left:4px solid ${a.color};cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.07)'">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-size:1.6rem">${a.icon}</span>
+        <span style="font-size:0.65rem;font-weight:800;color:${a.color};text-transform:uppercase;letter-spacing:1px;background:${a.color}18;padding:2px 7px;border-radius:10px;">${a.sigla}</span>
+      </div>
+      <div style="font-size:0.85rem;font-weight:700;color:#1f2937;margin-bottom:6px;line-height:1.3">${a.nombre}</div>
+      <div style="font-size:1.6rem;font-weight:900;color:${a.color}">${a.count}</div>
+      <div style="font-size:0.7rem;color:#6b7280;margin-bottom:6px">participantes</div>
+      <div style="height:5px;background:#f3f4f6;border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${a.color};border-radius:4px;"></div></div>
+      <div style="font-size:0.68rem;color:${a.color};font-weight:600;margin-top:4px">${pct}% · 👆 ver lista</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== MODAL =====
+function openGenericModal(title, people, summaryHtml) {
+  document.getElementById('modal-generic-title').textContent = title;
+  document.getElementById('modal-generic-summary').innerHTML = summaryHtml||'';
+  document.getElementById('modal-generic-body').innerHTML = people.map((p,i) => {
+    const bg = i%2===1?'background:#f9fafb':'';
+    return `<tr style="${bg}">
+      <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:0.78rem">${i+1}</td>
+      <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;font-weight:600">${p.nombre}</td>
+      <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;text-align:center">${catBadge(p.categoria)}</td>
+      <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;text-align:center;color:#6b7280">${p.edad!==null?p.edad:'—'}</td>
+      <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;text-align:center;font-weight:700;color:var(--azul-oscuro)">${p.total_asistencias}/3</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('modal-generic').classList.add('open');
+}
+
+function openModal(type, param) {
+  if (type === 'all3') {
+    const all3 = PEOPLE.filter(p=>p.total_asistencias===3);
+    document.getElementById('modal-all3-grid').innerHTML = all3.map((p,i) => `
+      <div class="modal-person"><span class="mp-num">${i+1}</span>
+        <div><div class="mp-name">${p.nombre}</div>
+        <div class="mp-cat">${p.categoria}${p.edad?' · '+p.edad+' años':''}</div></div>
+      </div>`).join('');
+    document.getElementById('modal-all3').classList.add('open');
+  }
+  if (type === 'cat') {
+    const catNames={'Niño':'👶🏻 Niños','Preadolescente':'🧒🏻 Preadolescentes','Adolescente':'👩🏼 Jóvenes','Adulto':'🧔🏻‍♂️ Adultos'};
+    const people = param==='Adulto' ? PEOPLE.filter(p=>p.categoria==='Adulto'||p.categoria==='Sin fecha') : PEOPLE.filter(p=>p.categoria===param);
+    const asist = people.filter(p=>p.total_asistencias>0).length;
+    document.getElementById('modal-cat-title').textContent = `${catNames[param]||param} — ${people.length} registrados`;
+    document.getElementById('modal-cat-summary').innerHTML = `
+      <span style="background:#dbeafe;color:#1d4ed8;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600">${people.length} registrados</span>
+      <span style="background:#dcfce7;color:#15803d;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600">${asist} asistieron al menos 1 vez</span>
+      <span style="background:#fee2e2;color:#b91c1c;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600">${people.length-asist} nunca han asistido</span>`;
+    document.getElementById('modal-cat-body').innerHTML = people.map((p,i) => {
+      const bg=i%2===1?'background:#f9fafb':'';
+      return `<tr style="${bg}">
+        <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:0.78rem">${i+1}</td>
+        <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;font-weight:600">${p.nombre}</td>
+        <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;text-align:center">${p.edad!==null?p.edad:'—'}</td>
+        <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;text-align:center">${p.asistencias['19.04.2026']?'✅':'❌'}</td>
+        <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;text-align:center">${p.asistencias['26.04.2026']?'✅':'❌'}</td>
+        <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;text-align:center">${p.asistencias['03.05.2026']?'✅':'❌'}</td>
+        <td style="padding:9px 14px;border-bottom:1px solid #e5e7eb;text-align:center;font-weight:700;color:var(--azul-oscuro)">${p.total_asistencias}/3</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('modal-cat').classList.add('open');
+  }
+  if (type === 'fecha') {
+    const people = PEOPLE.filter(p=>p.asistencias[param]===1).sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
+    openGenericModal(`📅 Asistentes el ${param} — ${people.length} hermanos`, people,
+      `<span style="background:#dcfce7;color:#15803d;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600">${people.length} asistentes</span>`);
+  }
+  if (type === 'inasist2') {
+    openGenericModal(`⚠️ Con 2+ inasistencias — ${INASIST_DATA.length} hermanos`, INASIST_DATA,
+      `<span style="background:#fee2e2;color:#b91c1c;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600">${INASIST_DATA.length} personas con 2+ inasistencias</span>`);
+  }
+  if (type === 'activity') {
+    const {label, people} = param;
+    openGenericModal(`${label} — ${people.length} participantes`, people,
+      `<span style="background:#dbeafe;color:#1d4ed8;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600">${people.length} asistentes</span>`);
+  }
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+
+// ===== REGISTRO DE CLASES (Google Sheets) =====
+// ⚠️ Reemplaza esta URL con la que te entregó Apps Script después de implementar
+const SHEET_ID = '16Yu7aUyL-upf-OnJjfcGxsmw2FcPlHxBJg9R2OE18oY';
+// Apps Script solo se usa para guardar clases (POST). Lectura viene directo de Sheets API pública.
+let SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEnvDMZTJS2B49HR1xaQeszgP4gIC0vw2XBMwNweSDglruYtM4ferse8gu24oHv0Ja/exec';
+
+let claseActiva = null;
+let clasesCache = [];
+let syncing = false;
+
+const ACT_LABELS = {
+  RG:'⛪ Reunión General', RJ:'📖 Reunión Jueves', EB:'👩🏻‍🏫 Estudio Bíblico',
+  CO:'🙌🏻 Culto Oración',  RM:'👔 Reunión Ministros', RL:'👨🏻‍🏫 Reunión Líderes',
+  CE:'💒 Culto Especial',  RD:'👜 Reunión Dorcas',   CN:'👶🏻 Clase Niños',
+  CJ:'🧒🏻 Clase Jóvenes', CS:'👩🏼 Clase Señoritas',
+};
+
+function checkScriptURL() { return true; }
+
+// ── Leer Google Sheet pública via gviz/tq (sin CORS) ─
+function fetchSheet(sheetName) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'gviz_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    const timer  = setTimeout(() => {
+      cleanup();
+      reject(new Error('Timeout leyendo ' + sheetName));
+    }, 20000);
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = function(resp) {
+      cleanup();
+      resolve(resp);
+    };
+
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq=select+*&sheet=${encodeURIComponent(sheetName)}&callback=${cbName}`;
+    script.src = url;
+    script.onerror = () => { cleanup(); reject(new Error('Error leyendo ' + sheetName)); };
+    document.head.appendChild(script);
+  });
+}
+
+// Convierte respuesta gviz en array de arrays (como getValues() de Apps Script)
+function gvizToRows(resp) {
+  if (!resp || !resp.table) return [];
+  const cols = resp.table.cols || [];
+  const rows = resp.table.rows || [];
+  return rows.map(row =>
+    (row.c || []).map((cell, ci) => {
+      if (!cell || cell.v === null || cell.v === undefined) return '';
+      // Fechas: gviz las devuelve como Date(yyyy,m,d)
+      const col = cols[ci];
+      if (col && col.type === 'date' && typeof cell.v === 'string') {
+        const m = cell.v.match(/Date\((\d+),(\d+),(\d+)/);
+        if (m) return new Date(+m[1], +m[2], +m[3]);
+      }
+      if (col && col.type === 'datetime' && typeof cell.v === 'string') {
+        const m = cell.v.match(/Date\((\d+),(\d+),(\d+)/);
+        if (m) return new Date(+m[1], +m[2], +m[3]);
+      }
+      return cell.v;
+    })
+  );
+}
+
+// ── Parsear hoja Alfabeticamente ──────────────────────
+function parseAlfaSheet(rows) {
+  if (!rows || rows.length < 5) return { people:[], dates:[], sellados:[], bautizados:[] };
+
+  const ROW_MES   = rows[0];
+  const ROW_SIGLA = rows[1];
+  const ROW_DIA   = rows[2];
+  const today     = new Date();
+
+  const MESES_MAP = {
+    'ene':1,'feb':2,'mar':3,'abr':4,'may':5,'jun':6,
+    'jul':7,'ago':8,'sep':9,'oct':10,'nov':11,'dic':12
+  };
+
+  // Detectar columnas de fechas pasadas (índice 3+)
+  const dateCols = [];
+  for (let col = 3; col < ROW_MES.length; col++) {
+    const mesRaw = String(ROW_MES[col]||'').trim().toLowerCase().substring(0,3);
+    const diaVal = ROW_DIA[col];
+    if (!mesRaw) continue;
+    const mesNum = MESES_MAP[mesRaw];
+    if (!mesNum) continue;
+    const dia = typeof diaVal === 'number' ? diaVal : (diaVal instanceof Date ? diaVal.getDate() : parseFloat(diaVal));
+    if (!dia || isNaN(dia) || dia < 1) continue;
+    const fechaDate = new Date(2026, mesNum-1, Math.floor(dia));
+    if (fechaDate > today) continue;
+    const dd  = String(Math.floor(dia)).padStart(2,'0');
+    const mm  = String(mesNum).padStart(2,'0');
+    const sigla = String(ROW_SIGLA[col]||'').trim();
+    dateCols.push({ col, fecha:`${dd}.${mm}.2026`, sigla });
+  }
+
+  const fmtDate = v => {
+    if (!v) return null;
+    if (v instanceof Date && !isNaN(v)) {
+      const d=String(v.getDate()).padStart(2,'0');
+      const m=String(v.getMonth()+1).padStart(2,'0');
+      const y=v.getFullYear();
+      return `${d}-${m}-${y}`;
+    }
+    const s = String(v).trim();
+    return s.length > 3 ? s : null;
+  };
+
+  const people    = [];
+  const sellados  = [];
+  const bautizados = [];
+
+  for (let i = 4; i < rows.length; i++) {
+    const row    = rows[i];
+    const nombre = String(row[1]||'').trim();
+    if (!nombre || nombre.toUpperCase().includes('NOMBRES')) continue;
+
+    const edadRaw = row[2];
+    const edad    = (typeof edadRaw==='number' && edadRaw>0) ? Math.floor(edadRaw) : null;
+    let cat = 'Adulto';
+    if (edad!==null) {
+      if      (edad<=5)  cat='Niño';
+      else if (edad<=13) cat='Preadolescente';
+      else if (edad<=20) cat='Joven';
+    }
+
+    const asistencias = {};
+    let totalA=0, totalI=0;
+    dateCols.forEach(dc => {
+      const v    = row[dc.col];
+      const vino = (v===true || v===1 || String(v).toUpperCase()==='TRUE' || String(v).toUpperCase()==='X');
+      asistencias[dc.fecha] = vino ? 1 : 0;
+      vino ? totalA++ : totalI++;
+    });
+
+    const nacimiento = fmtDate(row[39]);
+    const sellado    = fmtDate(row[49]);
+    const bautismo   = fmtDate(row[50]);
+
+    if (sellado)  sellados.push({ nombre, edad, fecha: sellado });
+    if (bautismo) bautizados.push({ nombre, edad, fecha: bautismo });
+
+    people.push({ nombre, edad, categoria:cat, nacimiento, sellado, bautismo,
+      total_asistencias:totalA, total_inasistencias:totalI, asistencias });
+  }
+
+  people.sort((a,b)     => a.nombre.localeCompare(b.nombre,'es'));
+  sellados.sort((a,b)   => (b.fecha||'').localeCompare(a.fecha||''));
+  bautizados.sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
+
+  return { people, dates: dateCols.map(dc=>dc.fecha), datesMeta: dateCols, sellados, bautizados };
+}
+
+// ── POST para guardar clases (Apps Script) ────────────
+async function apiPost(body) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(body),
+    });
+  } catch(e) { console.warn('POST error:', e); }
+  return { ok: true };
+}
+
+// ── Guardar en Sheets (con debounce) ─────────────────
+let saveTimer = null;
+function scheduleSync() {
+  if (!claseActiva || !SCRIPT_URL) return;
+  clearTimeout(saveTimer);
+  showSyncStatus('⏳ Guardando...');
+  saveTimer = setTimeout(async () => {
+    try {
+      await apiPost({ action: 'saveClase', clase: claseActiva });
+      showSyncStatus('✅ Guardado en Google Sheets', 2000);
+      renderHistorial();
+    } catch(e) {
+      showSyncStatus('❌ Error al guardar — revisa tu conexión', 4000);
+    }
+  }, 800);
+}
+
+function showSyncStatus(msg, clearMs) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  el.textContent = msg;
+  if (clearMs) setTimeout(() => { if(el) el.textContent = ''; }, clearMs);
+}
+
+// ── Cargar clases desde Sheets ───────────────────────
+async function loadClasesFromSheets() {
+  // Clases se guardan via Apps Script POST. Para leer, usamos el mismo endpoint si funciona.
+  // Si no, simplemente mostramos vacío (los datos se mantienen en memoria durante la sesión).
+  renderHistorial();
+}
+
+// ── Crear clase ──────────────────────────────────────
+async function crearClase() {
+  if (!checkScriptURL()) return;
+  const fecha = document.getElementById('clase-fecha').value;
+  const act   = document.getElementById('clase-actividad').value;
+  if (!fecha) { alert('Por favor selecciona una fecha.'); return; }
+
+  const existe = clasesCache.find(c => c.fecha === fecha && c.actividad === act);
+  if (existe) {
+    if (!confirm(`Ya existe un registro para ${ACT_LABELS[act]} el ${formatFecha(fecha)}. ¿Quieres abrirlo?`)) return;
+    claseActiva = existe;
+  } else {
+    const asistentes = {};
+    PEOPLE.forEach(p => asistentes[p.nombre] = false);
+    claseActiva = { id: Date.now(), fecha, actividad: act, asistentes };
+    clasesCache.push(claseActiva);
+    try {
+      await apiPost({ action: 'saveClase', clase: claseActiva });
+      showSyncStatus('✅ Clase creada en Google Sheets', 2000);
+    } catch(e) {
+      showSyncStatus('❌ Error al crear — revisa tu conexión', 4000);
+    }
+  }
+  abrirClaseUI();
+  renderHistorial();
+}
+
+function abrirClaseUI() {
+  if (!claseActiva) return;
+  document.getElementById('clase-activa-wrap').style.display = 'block';
+  document.getElementById('clase-activa-titulo').textContent =
+    `${ACT_LABELS[claseActiva.actividad]} — ${formatFecha(claseActiva.fecha)}`;
+  renderClasePeople();
+  renderClaseCatResumen();
+}
+
+function cerrarClase() {
+  claseActiva = null;
+  document.getElementById('clase-activa-wrap').style.display = 'none';
+}
+
+function formatFecha(f) {
+  if (!f) return '';
+  const [y,m,d] = f.split('-');
+  const meses = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${d} ${meses[parseInt(m)]} ${y}`;
+}
+
+function renderClasePeople() {
+  if (!claseActiva) return;
+  const buscar = document.getElementById('clase-buscar').value.trim().toLowerCase();
+  const cat    = document.getElementById('clase-cat-filter').value;
+
+  const filtered = PEOPLE.filter(p => {
+    if (buscar && !p.nombre.toLowerCase().includes(buscar)) return false;
+    if (cat !== 'all' && p.categoria !== cat) return false;
+    return true;
+  }).sort((a,b) => a.nombre.localeCompare(b.nombre,'es'));
+
+  const total = Object.values(claseActiva.asistentes).filter(Boolean).length;
+  document.getElementById('clase-resumen').textContent = `${total} presentes de ${PEOPLE.length}`;
+
+  document.getElementById('clase-people-list').innerHTML = filtered.map(p => {
+    const presente = !!claseActiva.asistentes[p.nombre];
+    const catColor = {Niño:'#f59e0b',Preadolescente:'#ec4899',Joven:'#8b5cf6',Adulto:'#2563a8'}[p.categoria] || '#6b7280';
+    const nombreEsc = p.nombre.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div onclick="toggleAsistente('${nombreEsc}')"
+      style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;
+             border:2px solid ${presente ? '#22c55e' : '#e5e7eb'};
+             background:${presente ? '#f0fdf4' : 'white'};transition:all 0.15s;">
+      <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+                  background:${presente ? '#22c55e' : '#f3f4f6'};flex-shrink:0;font-size:1rem;color:white;font-weight:700;">
+        ${presente ? '✓' : ''}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.85rem;font-weight:600;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.nombre}</div>
+        <div style="font-size:0.7rem;color:${catColor};font-weight:600;">${p.categoria}${p.edad ? ' · ' + p.edad + ' años' : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderClaseCatResumen();
+}
+
+function renderClaseCatResumen() {
+  if (!claseActiva) return;
+  const CATS = [
+    {key:'Niño',label:'Niños',icon:'👶🏻',color:'#f59e0b'},
+    {key:'Preadolescente',label:'Preadolesc.',icon:'🧒🏻',color:'#ec4899'},
+    {key:'Joven',label:'Jóvenes',icon:'👩🏼',color:'#8b5cf6'},
+    {key:'Adulto',label:'Adultos',icon:'🧔🏻‍♂️',color:'#2563a8'},
+  ];
+  const total = Object.values(claseActiva.asistentes).filter(Boolean).length;
+  document.getElementById('clase-resumen').textContent = `${total} presentes de ${PEOPLE.length}`;
+  document.getElementById('clase-cat-resumen').innerHTML = CATS.map(c => {
+    const catPeople = PEOPLE.filter(p => p.categoria === c.key);
+    const n = catPeople.filter(p => claseActiva.asistentes[p.nombre]).length;
+    return `<span style="display:inline-flex;align-items:center;gap:5px;background:white;border:1.5px solid ${c.color};
+                border-radius:20px;padding:4px 12px;font-size:0.78rem;font-weight:600;color:${c.color};">
+      ${c.icon} ${c.label}: <strong>${n}</strong>
+    </span>`;
+  }).join('');
+}
+
+function toggleAsistente(nombre) {
+  if (!claseActiva) return;
+  claseActiva.asistentes[nombre] = !claseActiva.asistentes[nombre];
+  const idx = clasesCache.findIndex(c => c.id === claseActiva.id);
+  if (idx >= 0) clasesCache[idx] = claseActiva;
+  renderClasePeople();
+  scheduleSync();
+}
+
+function marcarTodos(valor) {
+  if (!claseActiva) return;
+  const buscar = document.getElementById('clase-buscar').value.trim().toLowerCase();
+  const cat    = document.getElementById('clase-cat-filter').value;
+  PEOPLE.filter(p => {
+    if (buscar && !p.nombre.toLowerCase().includes(buscar)) return false;
+    if (cat !== 'all' && p.categoria !== cat) return false;
+    return true;
+  }).forEach(p => { claseActiva.asistentes[p.nombre] = valor; });
+  const idx = clasesCache.findIndex(c => c.id === claseActiva.id);
+  if (idx >= 0) clasesCache[idx] = claseActiva;
+  renderClasePeople();
+  scheduleSync();
+}
+
+function renderHistorial() {
+  const clases = [...clasesCache].sort((a,b) => b.fecha.localeCompare(a.fecha));
+  const el = document.getElementById('clase-historial');
+  if (!clases.length) {
+    el.innerHTML = `<div style="text-align:center;padding:30px;color:var(--gris-medio);">
+      <div style="font-size:2.5rem;margin-bottom:10px">📋</div>
+      <div>No hay registros guardados. Crea tu primera clase arriba.</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;">` +
+    clases.map(c => {
+      const total = Object.values(c.asistentes).filter(Boolean).length;
+      const isActive = claseActiva && claseActiva.id === c.id;
+      return `<div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:10px;
+                           border:2px solid ${isActive ? 'var(--azul-medio)' : 'var(--gris-claro)'};
+                           background:${isActive ? 'var(--azul-muy-claro)' : 'var(--gris-muy-claro)'};">
+        <div style="flex:1;">
+          <div style="font-weight:700;color:var(--azul-oscuro);font-size:0.92rem;">${ACT_LABELS[c.actividad] || c.actividad}</div>
+          <div style="font-size:0.78rem;color:var(--gris-medio);margin-top:2px;">📅 ${formatFecha(c.fecha)} &nbsp;·&nbsp; <strong style="color:var(--azul-medio)">${total}</strong> presentes</div>
+        </div>
+        <span id="sync-status-${c.id}" style="font-size:0.75rem;color:var(--gris-medio);"></span>
+        <button onclick="abrirHistorialClase(${c.id})"
+          style="background:var(--azul-medio);color:white;border:none;border-radius:8px;padding:7px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;">
+          ${isActive ? '✓ Activa' : '📝 Abrir'}
+        </button>
+        <button onclick="eliminarClase(${c.id})"
+          style="background:#fee2e2;color:#b91c1c;border:none;border-radius:8px;padding:7px 12px;font-size:0.82rem;font-weight:600;cursor:pointer;">
+          🗑
+        </button>
+      </div>`;
+    }).join('') + `</div>`;
+}
+
+function abrirHistorialClase(id) {
+  claseActiva = clasesCache.find(c => c.id === id);
+  if (claseActiva) { abrirClaseUI(); renderHistorial(); }
+}
+
+async function eliminarClase(id) {
+  if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
+  clasesCache = clasesCache.filter(c => c.id !== id);
+  if (claseActiva && claseActiva.id === id) cerrarClase();
+  renderHistorial();
+  if (SCRIPT_URL) {
+    try { await apiPost({ action: 'deleteClase', id }); }
+    catch(e) { console.warn('Error eliminando en Sheets:', e); }
+  }
+}
+
+// ===== INIT =====
+
+// ===== INIT =====
+// ── Carga dinámica desde Google Sheets ───────────────
+async function loadAllFromSheets() {
+  document.getElementById('hs-total').textContent = '⏳';
+  try {
+    // Leer hoja Alfabeticamente directamente via API pública de Google Sheets
+    const resp = await fetchSheet('Alfabeticamente');
+    const rows = gvizToRows(resp);
+    const result = parseAlfaSheet(rows);
+
+    if (!result.people.length) throw new Error('Sin datos');
+
+    // Actualizar datos globales
+    window.PEOPLE     = result.people;
+    window.DATES_DATA = result.dates;
+
+    // Stats header
+    const total    = result.people.length;
+    const nDates   = result.dates.length;
+    const all3     = result.people.filter(p => p.total_asistencias === nDates).length;
+    const never    = result.people.filter(p => p.total_asistencias === 0).length;
+    const inasist  = result.people.filter(p => p.total_inasistencias >= 2 && p.total_asistencias > 0).length;
+    const sumAsist = result.people.reduce((s,p) => s+p.total_asistencias, 0);
+    const prom     = nDates > 0 ? Math.round(sumAsist/(total*nDates)*100) : 0;
+
+    const hstats = document.querySelectorAll('.hstat');
+    if (hstats[0]) hstats[0].querySelector('.hstat-num').textContent = total;
+    if (hstats[1]) hstats[1].querySelector('.hstat-num').textContent = prom+'%';
+    if (hstats[2]) hstats[2].querySelector('.hstat-num').textContent = nDates;
+    if (hstats[3]) hstats[3].querySelector('.hstat-num').textContent = all3;
+    if (hstats[4]) hstats[4].querySelector('.hstat-num').textContent = never;
+    if (hstats[5]) hstats[5].querySelector('.hstat-num').textContent = inasist;
+
+    // Filtro fechas
+    const filterFecha = document.getElementById('filter-fecha');
+    if (filterFecha) {
+      filterFecha.innerHTML = '<option value="all">Todas las fechas</option>' +
+        result.dates.map(d => `<option value="${d}">${d}</option>`).join('');
+    }
+
+    // Encabezado tabla
+    rebuildAsistenciaHeader(result.dates);
+
+    // Re-renderizar listas
+    asistFiltered = [...window.PEOPLE];
+    filterAsistencia();
+    filterInasistencia();
+    filterNunca();
+    buildAgeCards();
+
+    // Sellados y Bautizados
+    if (result.sellados.length)   renderSellados(result.sellados);
+    if (result.bautizados.length) renderBautizados(result.bautizados);
+
+    console.log(`✅ Cargado: ${total} personas, ${nDates} fechas, ${result.sellados.length} sellados, ${result.bautizados.length} bautizados`);
+
+  } catch(e) {
+    console.error('Error cargando Sheets:', e);
+    document.getElementById('hs-total').textContent = PEOPLE.length;
+    // Mostrar error en sellados/bautizados
+    const errMsg = `<div style="padding:16px;color:#b91c1c;font-size:0.85rem;">❌ Error: ${e.message}</div>`;
+    const sb = document.getElementById('sellados-body');
+    const bb = document.getElementById('bautizados-body');
+    if (sb) sb.innerHTML = errMsg;
+    if (bb) bb.innerHTML = errMsg;
+  }
+}
+
+function renderSellados(sellados) {
+  // Agrupar por año
+  const byYear = {};
+  sellados.forEach(s => {
+    const yr = s.fecha ? s.fecha.split('-')[2] : '??';
+    if (!byYear[yr]) byYear[yr] = [];
+    byYear[yr].push(s);
+  });
+  const years = Object.keys(byYear).sort((a,b) => b-a);
+  let html = '';
+  let num = 1;
+  years.forEach(yr => {
+    html += `<div style="padding:10px 16px 4px;background:#fef3c7;border-bottom:1px solid #fde68a;${num>1?'border-top:2px solid #e5e7eb':''};"><span style="font-size:0.75rem;font-weight:800;color:#92400e;text-transform:uppercase;letter-spacing:0.8px;">📅 ${yr}</span></div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.875rem;"><tbody>`;
+    byYear[yr].forEach(s => {
+      const bg = num%2===0?'background:#f9fafb':'';
+      html += `<tr style="${bg}">
+        <td style="padding:11px 14px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:0.8rem;width:28px">${num}</td>
+        <td style="padding:11px 14px;border-bottom:1px solid #e5e7eb;font-weight:600">${s.nombre}</td>
+        <td style="padding:11px 14px;border-bottom:1px solid #e5e7eb;text-align:center;color:#6b7280">${s.edad ? s.edad+' años' : '—'}</td>
+        <td style="padding:11px 14px;border-bottom:1px solid #e5e7eb;text-align:center"><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:600">🔥 ${s.fecha||'—'}</span></td>
+      </tr>`;
+      num++;
+    });
+    html += `</tbody></table>`;
+  });
+  const wrap = document.getElementById('sellados-body');
+  if (wrap) {
+    wrap.innerHTML = html;
+    const header = document.getElementById('sellados-count');
+    if (header) header.textContent = `${sellados.length} registros`;
+    const footer = document.getElementById('sellados-footer');
+    if (footer) footer.textContent = `🔥 ${sellados.length} hermanos sellados — ${years.length} año${years.length>1?'s':''}`;
+  }
+}
+
+function renderBautizados(bautizados) {
+  const byYear = {};
+  bautizados.forEach(b => {
+    const yr = b.fecha ? b.fecha.split('-')[2] : '??';
+    if (!byYear[yr]) byYear[yr] = [];
+    byYear[yr].push(b);
+  });
+  const years = Object.keys(byYear).sort((a,b) => b-a);
+  let html = '';
+  let num = 1;
+  years.forEach(yr => {
+    html += `<div style="padding:10px 16px 4px;background:#dbeafe;border-bottom:1px solid #bfdbfe;${num>1?'border-top:2px solid #e5e7eb':''};"><span style="font-size:0.75rem;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.8px;">📅 ${yr}</span></div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.875rem;"><tbody>`;
+    byYear[yr].forEach(b => {
+      const bg = num%2===0?'background:#f9fafb':'';
+      html += `<tr style="${bg}">
+        <td style="padding:11px 14px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:0.8rem;width:28px">${num}</td>
+        <td style="padding:11px 14px;border-bottom:1px solid #e5e7eb;font-weight:600">${b.nombre}</td>
+        <td style="padding:11px 14px;border-bottom:1px solid #e5e7eb;text-align:center;color:#6b7280">${b.edad ? b.edad+' años' : '—'}</td>
+        <td style="padding:11px 14px;border-bottom:1px solid #e5e7eb;text-align:center"><span style="background:#dbeafe;color:#1d4ed8;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:600">💧 ${b.fecha||'—'}</span></td>
+      </tr>`;
+      num++;
+    });
+    html += `</tbody></table>`;
+  });
+  const wrap = document.getElementById('bautizados-body');
+  if (wrap) {
+    wrap.innerHTML = html;
+    const header = document.getElementById('bautizados-count');
+    if (header) header.textContent = `${bautizados.length} registros`;
+    const footer = document.getElementById('bautizados-footer');
+    if (footer) footer.textContent = `💧 ${bautizados.length} hermanos bautizados`;
+  }
+}
+
+window.onload = async function() {
+  buildDashboard();
+  buildAgeCards();
+  buildMonthlyChart();
+  buildActivityGrid();
+  filterAsistencia();
+  filterInasistencia();
+  filterNunca();
+  loadClasesFromSheets();
+  document.getElementById('clase-fecha').value = new Date().toISOString().split('T')[0];
+  await loadAllFromSheets();
+};
+</script>
+</body>
+</html>
