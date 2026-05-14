@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TLC — Registro Niños 2026</title>
+<style>
+:root{--ao:#1a3a5c;--am:#2563a8;--gc:#e5e7eb;--gm:#6b7280;--gmc:#f3f4f6;--amc:#dbeafe;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f9ff;min-height:100vh;}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#1a3a5c,#2563a8);color:white;box-shadow:0 4px 16px rgba(0,0,0,0.25);}
+.hdr-inner{max-width:960px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:11px;}
+.logo-icon{width:44px;height:44px;background:rgba(255,255,255,0.15);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.logo h1{font-size:1.1rem;font-weight:700;}
+.logo p{font-size:0.68rem;opacity:0.78;margin-top:2px;}
+.hstats{display:flex;gap:7px;flex-wrap:wrap;}
+.hs{text-align:center;background:rgba(255,255,255,0.12);border-radius:9px;padding:6px 12px;}
+.hs-n{font-size:1.25rem;font-weight:800;}
+.hs-l{font-size:0.58rem;opacity:0.8;text-transform:uppercase;letter-spacing:0.3px;}
+
+/* TABS */
+.tabs-wrap{background:rgba(0,0,0,0.12);}
+.tabs{max-width:960px;margin:0 auto;display:flex;padding:0 18px;overflow-x:auto;}
+.tab{background:none;border:none;color:rgba(255,255,255,0.65);padding:11px 18px;cursor:pointer;font-size:0.82rem;font-weight:500;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.tab:hover{color:white;background:rgba(255,255,255,0.07);}
+.tab.active{color:white;border-bottom-color:#60a5fa;background:rgba(255,255,255,0.1);}
+
+.main{max-width:960px;margin:0 auto;padding:18px;}
+.sec{display:none;}.sec.active{display:block;}
+
+/* CARDS */
+.card{background:white;border-radius:12px;box-shadow:0 2px 14px rgba(0,0,0,0.08);overflow:hidden;margin-bottom:16px;}
+.ch{background:linear-gradient(90deg,#1a3a5c,#2563a8);color:white;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;}
+.ch h2{font-size:0.9rem;font-weight:600;}
+.cb{padding:16px 18px;}
+
+/* FECHA BAR */
+.fb{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:white;padding:13px 18px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.07);margin-bottom:16px;}
+.fb label{font-size:0.72rem;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:0.4px;}
+.fb input,.fb select{border:1.5px solid var(--gc);border-radius:8px;padding:8px 11px;font-size:0.85rem;outline:none;}
+.fb input:focus,.fb select:focus{border-color:#3b82c4;}
+.btn-p{background:linear-gradient(135deg,#1a3a5c,#2563a8);color:white;border:none;border-radius:8px;padding:9px 18px;font-size:0.85rem;font-weight:600;cursor:pointer;}
+.btn-p:hover{opacity:0.9;}
+.btn-s{background:#16a34a;color:white;border:none;border-radius:8px;padding:9px 18px;font-size:0.88rem;font-weight:600;cursor:pointer;display:block;margin:18px auto 0;}
+.btn-s:hover{opacity:0.9;}
+.btn-o{background:white;color:#2563a8;border:2px solid #2563a8;border-radius:8px;padding:7px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;}
+.btn-or{background:white;color:#b91c1c;border:2px solid #b91c1c;border-radius:8px;padding:7px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;}
+
+/* SUMMARY */
+.sumbar{background:linear-gradient(135deg,#dcfce7,#bbf7d0);border:2px solid #22c55e;border-radius:12px;padding:12px 18px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.sum-n{font-size:1.9rem;font-weight:900;color:#15803d;}
+.sum-l{font-size:0.7rem;color:#166534;font-weight:600;}
+.sync{margin-left:auto;font-size:0.8rem;font-weight:600;}
+.sok{color:#15803d;}.serr{color:#b91c1c;}.spend{color:#d97706;}
+
+/* NIÑOS GRID */
+.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:9px;}
+.nc{background:white;border:2.5px solid var(--gc);border-radius:11px;padding:12px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:11px;user-select:none;}
+.nc:hover{border-color:#93c5fd;background:#f0f9ff;transform:translateY(-1px);}
+.nc.pres{border-color:#22c55e;background:#f0fdf4;}
+.nav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;background:#f3f4f6;transition:all 0.18s;position:relative;}
+.nc.pres .nav{background:#22c55e;}
+.chk{display:none;font-size:1rem;color:white;font-weight:700;}
+.nc.pres .chk{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
+.nc.pres .emo{display:none;}
+.nnom{font-size:0.8rem;font-weight:700;color:#1f2937;line-height:1.3;}
+.ninf{font-size:0.67rem;color:var(--gm);margin-top:2px;}
+
+/* FICHA */
+.fcard{background:white;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);padding:18px;margin-bottom:10px;border-left:5px solid #2563a8;transition:box-shadow 0.2s;}
+.fcard:hover{box-shadow:0 4px 18px rgba(0,0,0,0.13);}
+.fname{font-size:0.95rem;font-weight:700;color:#1a3a5c;margin-bottom:11px;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;}
+.fr{display:flex;gap:7px;align-items:flex-start;}
+.fl{font-size:0.7rem;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:0.3px;min-width:85px;}
+.fv{font-size:0.82rem;font-weight:500;color:#1f2937;}
+.fv.empty{color:#d1d5db;}
+.abadge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:0.68rem;font-weight:700;}
+.apres{background:#dcfce7;color:#15803d;}
+.aaus{background:#fee2e2;color:#b91c1c;}
+
+/* HISTORIAL */
+.hitem{background:#f9fafb;border:1.5px solid var(--gc);border-radius:10px;padding:12px 15px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background 0.15s;}
+.hitem:hover{background:#f0f9ff;border-color:#93c5fd;}
+.hfecha{font-weight:700;color:#1a3a5c;font-size:0.88rem;}
+.hact{font-size:0.75rem;color:var(--gm);margin-top:1px;}
+.hcount{font-size:1.3rem;font-weight:800;color:#15803d;margin-left:auto;}
+
+/* STATUS */
+.status{text-align:center;padding:9px 14px;font-size:0.8rem;font-weight:600;border-radius:8px;margin-bottom:14px;}
+.s-conn{background:#fef3c7;color:#92400e;}
+.s-ok{background:#dcfce7;color:#15803d;}
+.s-err{background:#fee2e2;color:#b91c1c;}
+
+@media(max-width:580px){
+  .ngrid{grid-template-columns:repeat(2,1fr);}
+  .hstats{display:none;}
+  .fgrid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="logo">
+      <div class="logo-icon">👶🏻</div>
+      <div>
+        <h1>TLC — Registro Niños 2026</h1>
+        <p>Templo La Cisterna &nbsp;·&nbsp; Clase Niños y Pre Adoles.</p>
+      </div>
+    </div>
+    <div class="hstats">
+      <div class="hs"><div class="hs-n">21</div><div class="hs-l">Total</div></div>
+      <div class="hs"><div class="hs-n">5</div><div class="hs-l">Niños</div></div>
+      <div class="hs"><div class="hs-n">16</div><div class="hs-l">Pre Adoles.</div></div>
+      <div class="hs"><div class="hs-n" id="hs-pres">0</div><div class="hs-l">Presentes</div></div>
+    </div>
+  </div>
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('lista')">📋 Pasar Lista</button>
+      <button class="tab" onclick="showTab('fichas')">👤 Fichas</button>
+      <button class="tab" onclick="showTab('historial')">📅 Historial</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- PASAR LISTA -->
+<div class="sec active" id="tab-lista">
+
+  <div class="fb">
+    <label>📅 Fecha:</label>
+    <input type="date" id="fecha" onchange="resetClase()">
+    <label>Actividad:</label>
+    <select id="act" style="min-width:170px;">
+      <option value="CN">👶🏻 CN — Clase Niños</option>
+      <option value="RG">⛪ RG — Reunión General</option>
+      <option value="RE">🌟 RE — Reunión Especial</option>
+      <option value="CE">💒 CE — Culto Especial</option>
+      <option value="CJ">🧒🏻 CJ — Clase Jóvenes</option>
+    </select>
+    <button class="btn-p" onclick="iniciar()">✓ Iniciar clase</button>
+  </div>
+
+  <div id="st-bar" style="display:none;"></div>
+
+  <div class="sumbar" id="sumbar" style="display:none;">
+    <div><div class="sum-n" id="s-pres">0</div><div class="sum-l">Presentes</div></div>
+    <div><div class="sum-n" style="color:#6b7280" id="s-aus">0</div><div class="sum-l">Ausentes</div></div>
+    <div><div class="sum-n" style="color:#2563a8">21</div><div class="sum-l">Total</div></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;">
+      <button class="btn-o" onclick="markAll(true)">✓ Todos</button>
+      <button class="btn-or" onclick="markAll(false)">✗ Limpiar</button>
+    </div>
+    <div class="sync" id="sync-msg"></div>
+  </div>
+
+  <div id="lista-wrap" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:0.82rem;font-weight:700;color:#1a3a5c;" id="clase-title">—</div>
+      <input type="text" id="buscar" placeholder="🔍 Buscar..." oninput="filtrar()"
+        style="border:1.5px solid var(--gc);border-radius:8px;padding:7px 12px;font-size:0.82rem;outline:none;width:180px;">
+    </div>
+    <div class="ngrid" id="ngrid"></div>
+    <button class="btn-s" onclick="guardar()">💾 Guardar en Google Sheets</button>
+  </div>
+
+  <div id="lista-empty" style="text-align:center;padding:50px 20px;color:var(--gm);">
+    <div style="font-size:4rem;margin-bottom:14px;">👶🏻</div>
+    <div style="font-size:1rem;font-weight:600;color:#1a3a5c;">Selecciona fecha y actividad</div>
+    <div style="font-size:0.82rem;margin-top:6px;">Luego haz clic en "Iniciar clase"</div>
+  </div>
+</div>
+
+<!-- FICHAS -->
+<div class="sec" id="tab-fichas">
+  <input type="text" id="buscar-f" placeholder="🔍 Buscar niño por nombre..." oninput="filtrarF()"
+    style="width:100%;border:1.5px solid var(--gc);border-radius:10px;padding:11px 16px;font-size:0.88rem;outline:none;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:16px;">
+  <div id="fichas-cont"></div>
+</div>
+
+<!-- HISTORIAL -->
+<div class="sec" id="tab-historial">
+  <div class="card">
+    <div class="ch"><h2>📅 Historial de Clases</h2><span id="hist-count" style="font-size:0.78rem;opacity:0.8;"></span></div>
+    <div class="cb" id="hist-body">
+      <div style="text-align:center;padding:28px;color:var(--gm);">
+        <div style="font-size:1.8rem;margin-bottom:8px">⏳</div>
+        <div>Cargando desde Google Sheets...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+const C = [{"nombre": "AGUSTINA", "edad": 11, "sexo": "M", "nacimiento": "17-02-2015", "telefono": null, "direccion": "PSJE. TABON #1060", "comuna": "LA CISTERNA", "categoria": "Pre Adoles."}, {"nombre": "AMANDA ZALDIVAR", "edad": 11, "sexo": "M", "nacimiento": "15-10-2015", "telefono": null, "direccion": "PSJE. LIMACHE 1591", "comuna": "MAIPU", "categoria": "Pre Adoles."}, {"nombre": "AMELIA ZALDIVAR", "edad": 4, "sexo": "M", "nacimiento": "09-02-2022", "telefono": null, "direccion": "PSJE. LIMACHE 1591", "comuna": "MAIPU", "categoria": "Niño"}, {"nombre": "AYENDRY ARIAS", "edad": 13, "sexo": "H", "nacimiento": "02-05-2013", "telefono": null, "direccion": null, "comuna": null, "categoria": "Pre Adoles."}, {"nombre": "BASTIAN RODRIGUEZ", "edad": 4, "sexo": "H", "nacimiento": "11-07-2022", "telefono": null, "direccion": "BUENAVENTURA 3945", "comuna": "LO ESPEJO", "categoria": "Niño"}, {"nombre": "CONSTANZA SAN MARTIN", "edad": 9, "sexo": "M", "nacimiento": "09-11-2017", "telefono": null, "direccion": "ALFREDO MACKENNEY 445", "comuna": "LA CISTERNA", "categoria": "Pre Adoles."}, {"nombre": "CRISTOBAL DE LA FUENTE", "edad": 9, "sexo": "H", "nacimiento": "23-01-2017", "telefono": null, "direccion": "BRIONES LUCO 0910 DEP 614", "comuna": "LA CISTERNA", "categoria": "Pre Adoles."}, {"nombre": "FLORENCIA BARROS", "edad": 5, "sexo": "M", "nacimiento": "22-10-2021", "telefono": null, "direccion": "LOS INQUILINOS #160", "comuna": "MAIPU", "categoria": "Niño"}, {"nombre": "ISABELLA FUENTES", "edad": 10, "sexo": "M", "nacimiento": "05-12-2015", "telefono": null, "direccion": "19 SUR #3779", "comuna": "LO ESPEJO", "categoria": "Pre Adoles."}, {"nombre": "JOAQUIN LERMANDA", "edad": 9, "sexo": "H", "nacimiento": "26-01-2017", "telefono": null, "direccion": "QUELLON #6743", "comuna": "LA CISTERNA", "categoria": "Pre Adoles."}, {"nombre": "JOAQUIN SOTO", "edad": 10, "sexo": "H", "nacimiento": "01-12-2015", "telefono": null, "direccion": "AV. TOBALABA 7377 DEP. 43C", "comuna": "LA FLORIDA", "categoria": "Pre Adoles."}, {"nombre": "JOHAN ARIAS", "edad": 13, "sexo": "H", "nacimiento": "10-03-2013", "telefono": null, "direccion": null, "comuna": null, "categoria": "Pre Adoles."}, {"nombre": "JORGITO EMANUEL ROJAS ARAYA", "edad": 1, "sexo": "H", "nacimiento": "31-01-2025", "telefono": null, "direccion": null, "comuna": null, "categoria": "Niño"}, {"nombre": "JOSE MARIA BARROS", "edad": 11, "sexo": "H", "nacimiento": "22-04-2015", "telefono": null, "direccion": "LOS INQUILINOS #160", "comuna": "MAIPU", "categoria": "Pre Adoles."}, {"nombre": "JULIANO ROJAS", "edad": 13, "sexo": "H", "nacimiento": "06-08-2013", "telefono": null, "direccion": "6 ORIENTE #4510", "comuna": "LO ESPEJO", "categoria": "Pre Adoles."}, {"nombre": "JULIETA RIQUELME", "edad": 13, "sexo": "M", "nacimiento": "10-11-2013", "telefono": null, "direccion": "GARCIA HURTADO #8293", "comuna": "LA FLORIDA", "categoria": "Pre Adoles."}, {"nombre": "KARLA SAN MARTIN", "edad": 1, "sexo": "M", "nacimiento": "23-06-2025", "telefono": null, "direccion": null, "comuna": null, "categoria": "Niño"}, {"nombre": "LISBETH ROJAS", "edad": 7, "sexo": "M", "nacimiento": "06-05-2019", "telefono": null, "direccion": "9 DE ENERO #03247", "comuna": "LO ESPEJO", "categoria": "Pre Adoles."}, {"nombre": "MATIAS ARAYA", "edad": 8, "sexo": "H", "nacimiento": "06-01-2018", "telefono": null, "direccion": "LOS ROBLES #805", "comuna": "SN. BERNARDO", "categoria": "Pre Adoles."}, {"nombre": "NEYSHA MONESTIME", "edad": 7, "sexo": "M", "nacimiento": "27-12-2018", "telefono": null, "direccion": "LA ESCUELA #6432", "comuna": "LA CISTERNA", "categoria": "Pre Adoles."}, {"nombre": "YOVANA ARIAS", "edad": 12, "sexo": "M", "nacimiento": "13-07-2014", "telefono": null, "direccion": null, "comuna": null, "categoria": "Pre Adoles."}];
+const SU = 'https://script.google.com/macros/s/AKfycbyncTIBa0YQLZL4Z2YSoi9aX_WV_451rRGQm7GuubM10DXn50JlbJQ_epim4DD_HExq/exec';
+const AN = {'CN':'Clase Niños','RG':'Reunión General','RE':'Reunión Especial','CE':'Culto Especial','CJ':'Clase Jóvenes'};
+const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+let pres = new Set();
+let clase = null;
+let regCache = [];
+let saveTimer = null;
+let filt = [...C];
+
+// ── INIT ───────────────────────────────────────────
+window.onload = function() {
+  const hoy = new Date();
+  const y=hoy.getFullYear(), m=String(hoy.getMonth()+1).padStart(2,'0'), d=String(hoy.getDate()).padStart(2,'0');
+  document.getElementById('fecha').value = `${y}-${m}-${d}`;
+  renderFichas(C);
+  cargarHistorial();
+};
+
+// ── TABS ───────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(event&&event.currentTarget) event.currentTarget.classList.add('active');
+  else document.querySelectorAll('.tab').forEach(t=>{
+    if(t.getAttribute('onclick')&&t.getAttribute('onclick').includes("'"+id+"'")) t.classList.add('active');
+  });
+}
+
+// ── LISTA ──────────────────────────────────────────
+function iniciar() {
+  const fecha = document.getElementById('fecha').value;
+  const act   = document.getElementById('act').value;
+  if(!fecha) { alert('Selecciona una fecha'); return; }
+
+  pres = new Set();
+  clase = { id: fecha+'_'+act, fecha, actividad: act };
+
+  // Cargar existente si hay
+  const ex = regCache.find(r => r.fecha===fecha && r.actividad===act);
+  if(ex && ex.presentes.length > 0) {
+    if(confirm(`Ya hay registro para ${AN[act]} el ${fmtF(fecha)} con ${ex.presentes.length} presentes. ¿Cargar?`))
+      ex.presentes.forEach(n => pres.add(n));
+  }
+
+  document.getElementById('lista-empty').style.display='none';
+  document.getElementById('lista-wrap').style.display='block';
+  document.getElementById('sumbar').style.display='flex';
+
+  const dt = getFecha(fecha);
+  document.getElementById('clase-title').textContent = `${AN[act]||act} — ${dt.dia} ${fmtF(fecha)}`;
+
+  filt = [...C];
+  document.getElementById('buscar').value = '';
+  renderGrid();
+  updateSum();
+}
+
+function resetClase() {
+  if(clase) {
+    pres.clear(); clase = null;
+    document.getElementById('lista-wrap').style.display='none';
+    document.getElementById('sumbar').style.display='none';
+    document.getElementById('lista-empty').style.display='block';
+    setSyncMsg('','');
+  }
+}
+
+// ── GRID ───────────────────────────────────────────
+function filtrar() {
+  const q = document.getElementById('buscar').value.trim().toLowerCase();
+  filt = q ? C.filter(c=>c.nombre.toLowerCase().includes(q)) : [...C];
+  renderGrid();
+}
+
+function renderGrid() {
+  document.getElementById('ngrid').innerHTML = filt.map(c => {
+    const pr = pres.has(c.nombre);
+    const cc = c.categoria==='Niño' ? '#f59e0b' : '#ec4899';
+    const em = c.categoria==='Niño' ? '👶🏻' : '🧒🏻';
+    const ne = c.nombre.replace(/'/g,"\'");
+    return `<div class="nc ${pr?'pres':''}" onclick="toggle('${ne}')">
+      <div class="nav">
+        <span class="emo">${em}</span>
+        <span class="chk">✓</span>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div class="nnom">${c.nombre}</div>
+        <div class="ninf">${c.edad} años · <span style="color:${cc};font-weight:600">${c.categoria}</span> · ${c.sexo==='H'?'🧔🏻‍♂️':'c.sexo==="M"?'👩🏼':'—'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggle(n) {
+  if(!clase) return;
+  pres.has(n) ? pres.delete(n) : pres.add(n);
+  renderGrid(); updateSum(); scheduleSave();
+}
+
+function markAll(v) {
+  if(!clase) return;
+  filt.forEach(c => v ? pres.add(c.nombre) : pres.delete(c.nombre));
+  renderGrid(); updateSum(); scheduleSave();
+}
+
+function updateSum() {
+  const n = pres.size, tot = C.length;
+  document.getElementById('s-pres').textContent = n;
+  document.getElementById('s-aus').textContent  = tot - n;
+  document.getElementById('hs-pres').textContent = n;
+}
+
+// ── GUARDAR ────────────────────────────────────────
+function scheduleSave() {
+  setSyncMsg('⏳ Guardando...','spend');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(guardar, 2000);
+}
+
+function guardar() {
+  if(!clase) { alert('Primero inicia una clase'); return; }
+  setSyncMsg('⏳ Guardando en Google Sheets...','spend');
+  clearTimeout(saveTimer);
+
+  const cb = 'tlcSave_'+Date.now();
+  const sc = document.createElement('script');
+  const timer = setTimeout(() => { cleanup(); setSyncMsg('❌ Tiempo agotado','serr'); }, 20000);
+
+  function cleanup() { clearTimeout(timer); delete window[cb]; if(sc.parentNode) sc.remove(); }
+
+  window[cb] = res => {
+    cleanup();
+    if(res && res.ok) {
+      setSyncMsg(`✅ Guardado (${res.total} presentes)`,'sok');
+      cargarHistorial();
+    } else {
+      setSyncMsg('❌ Error: '+(res&&res.error?res.error:'desconocido'),'serr');
+    }
+  };
+
+  const p = new URLSearchParams({
+    action:'guardarAsistencia',
+    id: clase.id, fecha: clase.fecha, actividad: clase.actividad,
+    presentes: JSON.stringify([...pres]),
+    callback: cb
+  });
+  sc.src = `${SU}?${p.toString()}`;
+  sc.onerror = () => { cleanup(); setSyncMsg('❌ Error de red','serr'); };
+  document.head.appendChild(sc);
+}
+
+function setSyncMsg(msg, cls) {
+  const el = document.getElementById('sync-msg');
+  el.textContent = msg;
+  el.className = 'sync ' + (cls||'');
+}
+
+// ── HISTORIAL ──────────────────────────────────────
+function apiGet(action) {
+  return new Promise((resolve,reject) => {
+    const cb = 'tlcGet_'+Date.now();
+    const sc = document.createElement('script');
+    const timer = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 18000);
+    function cleanup() { clearTimeout(timer); delete window[cb]; if(sc.parentNode) sc.remove(); }
+    window[cb] = d => { cleanup(); resolve(d); };
+    sc.src = `${SU}?action=${action}&callback=${cb}`;
+    sc.onerror = () => { cleanup(); reject(new Error('Error de red')); };
+    document.head.appendChild(sc);
+  });
+}
+
+async function cargarHistorial() {
+  try {
+    const res = await apiGet('getRegistros');
+    regCache = res.registros || [];
+    renderHistorial();
+  } catch(e) {
+    console.warn('No se pudo cargar historial:', e.message);
+    renderHistorial();
+  }
+}
+
+function renderHistorial() {
+  const el = document.getElementById('hist-body');
+  document.getElementById('hist-count').textContent = regCache.length + ' registros';
+  if(!regCache.length) {
+    el.innerHTML = `<div style="text-align:center;padding:28px;color:var(--gm);">
+      <div style="font-size:2rem;margin-bottom:8px">📋</div>
+      <div>Sin registros aún. Pasa la primera lista.</div></div>`;
+    return;
+  }
+  const sorted = [...regCache].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  el.innerHTML = sorted.map(r => {
+    const n = (r.presentes||[]).length;
+    const pct = Math.round(n/C.length*100);
+    const dt = getFecha(r.fecha);
+    const color = pct>=80?'#15803d':pct>=50?'#2563a8':'#f97316';
+    return `<div class="hitem" onclick="detalleHistorial('${r.id}')">
+      <div>
+        <div class="hfecha">${dt.dia} ${fmtF(r.fecha)}</div>
+        <div class="hact">${AN[r.actividad]||r.actividad}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-left:auto;">
+        <div style="text-align:center;">
+          <div style="font-size:1.2rem;font-weight:800;color:${color}">${n}</div>
+          <div style="font-size:0.62rem;color:var(--gm)">presentes</div>
+        </div>
+        <span style="background:${pct>=50?'#dbeafe':'#fee2e2'};color:${pct>=50?'#1d4ed8':'#b91c1c'};padding:2px 9px;border-radius:20px;font-size:0.72rem;font-weight:700;">${pct}%</span>
+        <span style="font-size:0.72rem;color:#2563a8;font-weight:600;">👆 ver</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function detalleHistorial(id) {
+  const r = regCache.find(x=>x.id===id);
+  if(!r) return;
+  const pArr = r.presentes||[];
+  const aus  = C.filter(c=>!pArr.includes(c.nombre));
+  const dt   = getFecha(r.fecha);
+  alert(`📅 ${dt.dia} ${fmtF(r.fecha)} — ${AN[r.actividad]||r.actividad}
+
+✅ Presentes (${pArr.length}):
+${pArr.join(', ')||'Ninguno'}
+
+❌ Ausentes (${aus.length}):
+${aus.map(c=>c.nombre).join(', ')||'Ninguno'}`);
+}
+
+// ── FICHAS ─────────────────────────────────────────
+function filtrarF() {
+  const q = document.getElementById('buscar-f').value.trim().toLowerCase();
+  renderFichas(q ? C.filter(c=>c.nombre.toLowerCase().includes(q)) : C);
+}
+
+function renderFichas(list) {
+  const cont = document.getElementById('fichas-cont');
+  if(!list.length) {
+    cont.innerHTML='<div style="text-align:center;padding:28px;color:var(--gm);">Sin resultados</div>';
+    return;
+  }
+  // Calcular asistencia de historial
+  cont.innerHTML = list.map(c => {
+    const cc = c.categoria==='Niño' ? '#f59e0b' : '#ec4899';
+    const em = c.categoria==='Niño' ? '👶🏻' : '🧒🏻';
+    const sexoStr = c.sexo==='H' ? '🧔🏻‍♂️ Hombre' : c.sexo==='M' ? '👩🏼 Mujer' : '—';
+
+    // Asistencia desde historial cargado
+    const histAsist = regCache.filter(r=>(r.presentes||[]).includes(c.nombre)).length;
+    const histTotal = regCache.length;
+    const pct = histTotal ? Math.round(histAsist/histTotal*100) : 0;
+    const pctColor = pct===100?'#16a34a':pct>=50?'#2563a8':'#f97316';
+
+    const val = (v,fallback='—') => v||`<span class="fv empty">${fallback}</span>`;
+
+    return `<div class="fcard">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;">
+        <div style="width:46px;height:46px;border-radius:50%;background:${cc}22;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;">${em}</div>
+        <div style="flex:1;">
+          <div class="fname" style="margin-bottom:4px;">${c.nombre}</div>
+          <span style="background:${cc}22;color:${cc};padding:2px 8px;border-radius:20px;font-size:0.7rem;font-weight:700;">${c.categoria}</span>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:1.4rem;font-weight:800;color:${pctColor}">${pct}%</div>
+          <div style="font-size:0.62rem;color:var(--gm)">asistencia</div>
+        </div>
+      </div>
+      <div class="fgrid">
+        <div class="fr"><span class="fl">🎂 Edad</span><span class="fv">${c.edad ? c.edad+' años' : '—'}</span></div>
+        <div class="fr"><span class="fl">📅 Nacimiento</span><span class="fv">${c.nacimiento||'—'}</span></div>
+        <div class="fr"><span class="fl">👤 Género</span><span class="fv">${sexoStr}</span></div>
+        <div class="fr"><span class="fl">📱 Teléfono</span><span class="fv">${c.telefono||'—'}</span></div>
+        <div class="fr" style="grid-column:1/-1;"><span class="fl">🏠 Dirección</span><span class="fv">${c.direccion||'—'}${c.comuna?' · '+c.comuna:''}</span></div>
+      </div>
+      ${histTotal>0 ? `<div style="margin-top:11px;padding-top:10px;border-top:1px solid var(--gc);">
+        <div style="font-size:0.68rem;font-weight:700;color:var(--gm);text-transform:uppercase;margin-bottom:6px;">Asistencia registrada</div>
+        <div style="font-size:0.82rem;color:#1a3a5c;"><strong>${histAsist}</strong> de <strong>${histTotal}</strong> clases registradas</div>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── HELPERS ────────────────────────────────────────
+function fmtF(f) {
+  if(!f) return '';
+  const [y,m,d] = f.split('-');
+  const ms=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${d} ${ms[parseInt(m)]} ${y}`;
+}
+function getFecha(f) {
+  const [y,m,d] = f.split('-');
+  const dt = new Date(`${y}-${m}-${d}T12:00:00`);
+  return { dia: DIAS[dt.getDay()], dt };
+}
+</script>
+</body>
+</html>
