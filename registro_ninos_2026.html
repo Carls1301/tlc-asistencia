@@ -214,9 +214,12 @@ let filt = [...C];
 
 // ── INIT ───────────────────────────────────────────
 window.onload = function() {
+  // Fecha de hoy inmediata
   const hoy = new Date();
   const y=hoy.getFullYear(), m=String(hoy.getMonth()+1).padStart(2,'0'), d=String(hoy.getDate()).padStart(2,'0');
-  document.getElementById('fecha').value = `${y}-${m}-${d}`;
+  const fechaHoy = `${y}-${m}-${d}`;
+  document.getElementById('fecha').value = fechaHoy;
+  document.getElementById('fecha').defaultValue = fechaHoy;
   renderFichas(C);
   cargarHistorial();
 };
@@ -291,7 +294,7 @@ function renderGrid() {
       </div>
       <div style="flex:1;min-width:0;">
         <div class="nnom">${c.nombre}</div>
-        <div class="ninf">${c.edad} años · <span style="color:${cc};font-weight:600">${c.categoria}</span> · ${c.sexo==='H'?'🧔🏻‍♂️':'c.sexo==="M"?'👩🏼':'—'}</div>
+        <div class="ninf">${c.edad} años · <span style="color:${cc};font-weight:600">${c.categoria}</span> · ${c.sexo==='H'?'🧔🏻‍♂️':c.sexo==='M'?'👩🏼':'—'}</div>
       </div>
     </div>`;
   }).join('');
