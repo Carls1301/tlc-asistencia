@@ -134,18 +134,26 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f9ff;min-height:100vh
 <!-- PASAR LISTA -->
 <div class="sec active" id="tab-lista">
 
-  <div class="fb">
-    <label>📅 Fecha:</label>
-    <input type="date" id="fecha" onchange="resetClase()">
-    <label>Actividad:</label>
-    <select id="act" style="min-width:170px;">
-      <option value="CN">👶🏻 CN — Clase Niños</option>
-      <option value="RG">⛪ RG — Reunión General</option>
-      <option value="RE">🌟 RE — Reunión Especial</option>
-      <option value="CE">💒 CE — Culto Especial</option>
-      <option value="CJ">🧒🏻 CJ — Clase Jóvenes</option>
-    </select>
-    <button class="btn-p" onclick="iniciar()">✓ Iniciar clase</button>
+  <div class="fb" style="gap:14px;">
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <label>📅 Fecha</label>
+      <input type="date" id="fecha" onchange="resetClase()"
+        style="font-size:1.1rem;font-weight:700;color:#1a3a5c;padding:10px 14px;border:2px solid #3b82c4;border-radius:10px;outline:none;min-width:180px;">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <label>Actividad</label>
+      <select id="act" style="font-size:1rem;font-weight:600;padding:10px 12px;border:2px solid var(--gc);border-radius:10px;outline:none;min-width:200px;">
+        <option value="CN">👶🏻 CN — Clase Niños</option>
+        <option value="RG">⛪ RG — Reunión General</option>
+        <option value="RE">🌟 RE — Reunión Especial</option>
+        <option value="CE">💒 CE — Culto Especial</option>
+        <option value="CJ">🧒🏻 CJ — Clase Jóvenes</option>
+      </select>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <label style="opacity:0">·</label>
+      <button class="btn-p" onclick="iniciar()" style="padding:11px 22px;font-size:0.95rem;">✓ Iniciar clase</button>
+    </div>
   </div>
 
   <div id="st-bar" style="display:none;"></div>
