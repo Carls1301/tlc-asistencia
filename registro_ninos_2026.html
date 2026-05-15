@@ -311,13 +311,13 @@ function renderGrid() {
 function toggle(n) {
   if(!clase) return;
   pres.has(n) ? pres.delete(n) : pres.add(n);
-  renderGrid(); updateSum(); scheduleSave();
+  renderGrid(); updateSum();
 }
 
 function markAll(v) {
   if(!clase) return;
   filt.forEach(c => v ? pres.add(c.nombre) : pres.delete(c.nombre));
-  renderGrid(); updateSum(); scheduleSave();
+  renderGrid(); updateSum();
 }
 
 function updateSum() {
